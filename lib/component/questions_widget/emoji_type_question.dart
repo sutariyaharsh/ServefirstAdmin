@@ -320,9 +320,9 @@ class _EmojiTypeQuestionState extends State<EmojiTypeQuestion> {
                               ?.length ??
                           0,
                       itemBuilder: (context, index) {
-                        final pickedImage = File(
+                        final pickedImage = /*File(*/
                             controller.imageFileAuditionListMap[
-                                widget.question.sId]![index]);
+                                widget.question.sId]![index]/*)*/;
                         return Container(
                           margin: EdgeInsets.symmetric(vertical: 5.h),
                           padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -341,15 +341,15 @@ class _EmojiTypeQuestionState extends State<EmojiTypeQuestion> {
                                   Radius.circular(5.r),
                                 ),
                                 image: DecorationImage(
-                                  image: FileImage(pickedImage),
+                                  image: MemoryImage(pickedImage),
                                   fit: BoxFit.cover,
                                 ),
                               ),
                             ),
                             title: Text(
-                              pickedImage.path
+                              /*pickedImage.path
                                   .split(Platform.pathSeparator)
-                                  .last,
+                                  .last*/"Image Name",
                               maxLines: 1,
                               style: TextStyle(
                                   fontWeight: FontWeight.w500,

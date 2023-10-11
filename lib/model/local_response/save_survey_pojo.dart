@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:hive/hive.dart';
 import 'package:servefirst_admin/model/request/survey_submit/survey_submit_json_data.dart';
 
@@ -19,5 +21,5 @@ class SaveSurveyPojo {
   @HiveField(6)
   Map<String, List<String>>? valueListMapFilesType;
   @HiveField(7)
-  Map<String, List<String>>? valueListMapFilesAudition;
+  Map<String, List<Uint8List>>? valueListMapFilesAudition;
 }

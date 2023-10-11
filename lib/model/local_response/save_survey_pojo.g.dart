@@ -29,7 +29,7 @@ class SaveSurveyPojoAdapter extends TypeAdapter<SaveSurveyPojo> {
               MapEntry(k as String, (v as List).cast<String>()))
       ..valueListMapFilesAudition = (fields[7] as Map?)?.map(
           (dynamic k, dynamic v) =>
-              MapEntry(k as String, (v as List).cast<String>()));
+              MapEntry(k as String, (v as List).cast<Uint8List>()));
   }
 
   @override

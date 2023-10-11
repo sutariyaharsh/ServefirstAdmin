@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -307,9 +308,9 @@ class _TextTypeQuestionState extends State<TextTypeQuestion> {
                               ?.length ??
                           0,
                       itemBuilder: (context, index) {
-                        final pickedImage = File(
+                        final pickedImage = /*File(*/
                             controller.imageFileAuditionListMap[
-                                widget.question.sId]![index]);
+                                widget.question.sId]![index]/*)*/;
                         return AuditionImageListItem(
                             pickedImage: pickedImage,
                             onDeleteClick: () =>
@@ -370,7 +371,7 @@ class AuditionImageListItem extends StatelessWidget {
     required this.onDeleteClick,
   });
 
-  final File pickedImage;
+  final Uint8List pickedImage;
   final VoidCallback onDeleteClick;
 
   @override
@@ -392,13 +393,14 @@ class AuditionImageListItem extends StatelessWidget {
               Radius.circular(5.r),
             ),
             image: DecorationImage(
-              image: FileImage(pickedImage),
+              image: MemoryImage(pickedImage),
               fit: BoxFit.cover,
             ),
           ),
         ),
         title: Text(
-          pickedImage.path.split(Platform.pathSeparator).last,
+          /*pickedImage.path.split(Platform.pathSeparator)
+                                  .last*/"Image Name",
           maxLines: 1,
           style: TextStyle(
               fontWeight: FontWeight.w500,

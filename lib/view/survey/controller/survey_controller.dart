@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -6,10 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:servefirst_admin/constnts/constants.dart';
 import 'package:servefirst_admin/model/local_response/save_survey_pojo.dart';
 import 'package:servefirst_admin/model/request/survey_submit/image_names.dart';
@@ -56,8 +57,8 @@ class SurveyController extends GetxController {
       <String, SurveySubmitMetaData>{}.obs;
   RxMap<String, SurveySubmitResponseData> surveyResponseDataMap =
       <String, SurveySubmitResponseData>{}.obs;
-  RxMap<String, List<String>> imageFileAuditionListMap =
-      <String, List<String>>{}.obs;
+  RxMap<String, List<Uint8List>> imageFileAuditionListMap =
+      <String, List<Uint8List>>{}.obs;
   RxMap<String, List<String>> imageFileListMap =
       <String, List<String>>{}.obs;
 
@@ -114,11 +115,11 @@ class SurveyController extends GetxController {
   }
 
   Future<void> addImageToAuditionMap(
-      String key, String imagePath, String qType) async {
+      String key, String imagePath, String qType, Uint8List imgMemoryData) async {
     if (!imageFileAuditionListMap.containsKey(key)) {
-      imageFileAuditionListMap[key] = <String>[].obs;
+      imageFileAuditionListMap[key] = <Uint8List>[].obs;
     }
-    imageFileAuditionListMap[key]!.add(imagePath);
+    imageFileAuditionListMap[key]!.add(imgMemoryData);
     if (surveyJsonDataMap.containsKey(key)) {
       if (surveyJsonDataMap[key]?.imageNamesList == null) {
         surveyJsonDataMap[key]?.imageNamesList = [];
@@ -137,7 +138,7 @@ class SurveyController extends GetxController {
       surveyJsonDataMap[key] = surveySubmitJsonData;
     }
 
-    getLog('${jsonEncode(surveyJsonDataMap)}');
+    log(jsonEncode(surveyJsonDataMap), name: "surveyJsonDataMap");
   }
 
   Future<void> addImageToFileMap(String key, String imagePath) async {
@@ -272,11 +273,12 @@ class SurveyController extends GetxController {
         // Loop through the map and its values (lists of files)
         await Future.wait(imageFileAuditionListMap.entries.map((entry) async {
           final key = entry.key;
-          final fileList = entry.value;
+          final uint8List = entry.value;
 
-          await Future.wait(fileList.map((imageFilePath) async {
+          await Future.wait(uint8List.map((uint8ListImg) async {
+            String? imageFilePath = await saveImageToTempDirectory(uint8ListImg);
             var imagePart =
-                await http.MultipartFile.fromPath(key, imageFilePath);
+                await http.MultipartFile.fromPath(key, imageFilePath ?? "");
             multipartFilesList.add(imagePart);
           }));
         }));
@@ -321,36 +323,49 @@ class SurveyController extends GetxController {
     try {
       final image = await ImagePicker().pickImage(source: source);
       if (image == null) return;
-      File? img = File(image.path);
-      img = await _cropImage(imageFile: img);
+      String? cropImgPath = await _cropImage(imagePath: image.path);
+      Uint8List? imageMemoryData = await getImageAsUint8List(cropImgPath ?? "");
       if (qType != "FileAnswer") {
-        addImageToAuditionMap(qId, img!.path, qType);
+        addImageToAuditionMap(qId, cropImgPath ?? "", qType, imageMemoryData ?? Uint8List(0));
       } else {
-        addImageToFileMap(qId, img!.path);
+        addImageToFileMap(qId, cropImgPath ?? "");
       }
       Get.back();
     } on PlatformException catch (e) {
-      print(e);
+      log("catch : ${e.toString()}", name: "pickImage");
       Get.back();
     }
   }
 
-  Future<File?> _cropImage({required File imageFile}) async {
+  Future<String?> _cropImage({required String imagePath}) async {
     CroppedFile? croppedImage =
-        await ImageCropper().cropImage(sourcePath: imageFile.path);
+    await ImageCropper().cropImage(sourcePath: imagePath);
     if (croppedImage == null) return null;
-    final parentPath = path.dirname(File(croppedImage.path).path);
-    getLog("parentPath : $parentPath");
-    return File(croppedImage.path);
-    /*final currentTime = DateTime.now();
-    final newFileName = '${currentTime.microsecondsSinceEpoch}.jpg';
-    // Get the cache directory path
-    final cacheDirectory = await getTemporaryDirectory();
-    final newPath = path.join(cacheDirectory.path, newFileName);
+    log(croppedImage.path, name: "_cropImage");
+    return croppedImage.path;
+  }
 
-    File newFile = File(newPath);
-    await newFile.writeAsBytes(await croppedImage.readAsBytes());
+  Future<Uint8List?> getImageAsUint8List(String imagePath) async {
+    final file = File(imagePath);
+    if (await file.exists()) {
+      final Uint8List uint8list = await file.readAsBytes();
+      return uint8list;
+    }
+    return null;
+  }
 
-    return newFile;*/
+  Future<String?> saveImageToTempDirectory(Uint8List imageBytes) async {
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
+      final filePath = '${tempDir.path}/$uniqueFileName.jpg';
+      final File imageFile = File(filePath);
+
+      await imageFile.writeAsBytes(imageBytes);
+      return filePath;
+    } catch (e) {
+      print("Error saving image to the temporary directory: $e");
+      return null;
+    }
   }
 }
