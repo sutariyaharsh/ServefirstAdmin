@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:get/get.dart';
 import 'package:servefirst_admin/model/response/login/user.dart';
-import 'package:servefirst_admin/route/app_route.dart';
 import 'package:servefirst_admin/service/local_service/local_login_service.dart';
+import 'package:servefirst_admin/view/login/login_screen.dart';
 
 class ProfileController extends GetxController {
   static ProfileController instance = Get.find();
@@ -15,7 +16,7 @@ class ProfileController extends GetxController {
   void onInit() async {
     await _localLoginService.init();
     loginUser.value = _localLoginService.getUser();
-    print("LoginUser :- ${jsonEncode(loginUser.value)}");
+    log(jsonEncode(loginUser.value), name: "LoginUser");
     super.onInit();
   }
 
@@ -23,11 +24,9 @@ class ProfileController extends GetxController {
     if (!_isNavigated) {
       _isNavigated = true;
       await _localLoginService.clear();
-      Get.offAllNamed(AppRoute.login);
+      Get.offAll(() => const LoginScreen());
     }
   }
 
-  void getLoginUser() async {
-
-  }
+  void getLoginUser() async {}
 }

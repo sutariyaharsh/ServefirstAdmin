@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:servefirst_admin/route/app_route.dart';
 import 'package:servefirst_admin/service/local_service/local_login_service.dart';
+import 'package:servefirst_admin/view/dashboard/dashboard_screen.dart';
+import 'package:servefirst_admin/view/login/login_screen.dart';
 
 class SplashController extends GetxController {
   static SplashController instance = Get.find();
@@ -11,6 +13,7 @@ class SplashController extends GetxController {
   void onInit() async {
     await _localLoginService.init();
     super.onInit();
+    await startAnimation();
   }
 
   Future startAnimation() async {
@@ -18,9 +21,9 @@ class SplashController extends GetxController {
     if (!_isNavigated) {
       _isNavigated = true;
       if (_localLoginService.getToken() == null) {
-        Get.offAllNamed(AppRoute.login);
+        Get.offAll(()=>const LoginScreen());
       } else {
-        Get.offAllNamed(AppRoute.dashboard);
+        Get.off(() => const DashboardScreen());
       }
     }
   }

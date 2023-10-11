@@ -1,15 +1,14 @@
 import 'dart:convert';
+import 'dart:developer';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:servefirst_admin/model/request/login_request.dart';
 import 'package:servefirst_admin/model/response/login/login.dart';
 import 'package:servefirst_admin/model/response/login/user.dart';
-import 'package:servefirst_admin/route/app_route.dart';
 import 'package:servefirst_admin/service/local_service/local_login_service.dart';
 import 'package:servefirst_admin/service/remote_service/remote_login_service.dart';
+import 'package:servefirst_admin/view/dashboard/dashboard_screen.dart';
 
 class LoginController extends GetxController {
   static LoginController instance = Get.find();
@@ -31,9 +30,8 @@ class LoginController extends GetxController {
       LoginRequest loginRequest =
           LoginRequest(email: email, password: password);
 
-      if (kDebugMode) {
-        print('*Login, Request : ${jsonEncode(loginRequest)}');
-      }
+      log("Request : ${jsonEncode(loginRequest)}", name: "Login");
+
       var result = await RemoteLoginService().login(loginRequest: loginRequest);
       if (result.statusCode == 200) {
         Login loginResponse = Login.fromJson(jsonDecode(result.body));
@@ -44,16 +42,17 @@ class LoginController extends GetxController {
           await _localLoginService.addUser(
               user: loginResponse.data?.user ?? User());
           EasyLoading.showSuccess("Login Success!");
-          Get.offAllNamed(AppRoute.dashboard);
-        }else {
+          log("Response : ${jsonEncode(loginResponse)}", name: "Login");
+          Get.offAll(() => const DashboardScreen());
+        } else {
           EasyLoading.showError('Email/password wrong. Try again!');
         }
       } else {
+        log("Response : ${result.statusCode} ** ${jsonEncode(result.body)}", name: "Login");
         EasyLoading.showError('Email/password wrong. Try again!');
       }
     } catch (e) {
-      debugPrint(e.toString());
-      EasyLoading.showError('Something wrong. Try again!');
+      log("catch : ${e.toString()}", name: "Login");
     } finally {
       EasyLoading.dismiss();
     }

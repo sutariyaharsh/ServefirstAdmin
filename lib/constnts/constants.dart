@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:servefirst_admin/controller/controllers.dart';
+import 'package:servefirst_admin/controller/shared_preferences_helper.dart';
 import 'package:servefirst_admin/theme/app_theme.dart';
 
 //Shared Preferences Keys
@@ -34,13 +34,10 @@ String getTodayDaysDateRange() {
   final apiStartDate = formatterApi.format(startDate);
   final apiEndDate = formatterApi.format(endDate);
 
-  sharedPreferencesController.saveString(
-      PrefKeys.START_DATE_FILTER, apiStartDate);
-  sharedPreferencesController.saveString(PrefKeys.END_DATE_FILTER, apiEndDate);
-  sharedPreferencesController.saveString(
-      PrefKeys.SELECTED_DATE_FILTER, "Today");
-  sharedPreferencesController.saveString(
-      PrefKeys.FILTER_DATES, "$formattedStartDate to $formattedEndDate");
+  SharedPreferencesHelper.saveString(PrefKeys.START_DATE_FILTER, apiStartDate);
+  SharedPreferencesHelper.saveString(PrefKeys.END_DATE_FILTER, apiEndDate);
+  SharedPreferencesHelper.saveString(PrefKeys.SELECTED_DATE_FILTER, "Today");
+  SharedPreferencesHelper.saveString(PrefKeys.FILTER_DATES, "$formattedStartDate to $formattedEndDate");
 
   return '$formattedStartDate to $formattedEndDate';
 }
@@ -59,13 +56,10 @@ String getLastSevenDaysDateRange() {
   final apiStartDate = formatterApi.format(startDate);
   final apiEndDate = formatterApi.format(endDate);
 
-  sharedPreferencesController.saveString(
-      PrefKeys.START_DATE_FILTER, apiStartDate);
-  sharedPreferencesController.saveString(PrefKeys.END_DATE_FILTER, apiEndDate);
-  sharedPreferencesController.saveString(
-      PrefKeys.SELECTED_DATE_FILTER, "Last 7 Days");
-  sharedPreferencesController.saveString(
-      PrefKeys.FILTER_DATES, "$formattedStartDate to $formattedEndDate");
+  SharedPreferencesHelper.saveString(PrefKeys.START_DATE_FILTER, apiStartDate);
+  SharedPreferencesHelper.saveString(PrefKeys.END_DATE_FILTER, apiEndDate);
+  SharedPreferencesHelper.saveString(PrefKeys.SELECTED_DATE_FILTER, "Last 7 Days");
+  SharedPreferencesHelper.saveString(PrefKeys.FILTER_DATES, "$formattedStartDate to $formattedEndDate");
 
   return '$formattedStartDate to $formattedEndDate';
 }
@@ -84,13 +78,10 @@ String getLastThirtyDaysDateRange() {
   final apiStartDate = formatterApi.format(startDate);
   final apiEndDate = formatterApi.format(endDate);
 
-  sharedPreferencesController.saveString(
-      PrefKeys.START_DATE_FILTER, apiStartDate);
-  sharedPreferencesController.saveString(PrefKeys.END_DATE_FILTER, apiEndDate);
-  sharedPreferencesController.saveString(
-      PrefKeys.SELECTED_DATE_FILTER, "Last 30 Days");
-  sharedPreferencesController.saveString(
-      PrefKeys.FILTER_DATES, "$formattedStartDate to $formattedEndDate");
+  SharedPreferencesHelper.saveString(PrefKeys.START_DATE_FILTER, apiStartDate);
+  SharedPreferencesHelper.saveString(PrefKeys.END_DATE_FILTER, apiEndDate);
+  SharedPreferencesHelper.saveString(PrefKeys.SELECTED_DATE_FILTER, "Last 30 Days");
+  SharedPreferencesHelper.saveString(PrefKeys.FILTER_DATES, "$formattedStartDate to $formattedEndDate");
 
   return '$formattedStartDate to $formattedEndDate';
 }
@@ -109,13 +100,10 @@ String getThisMonthDateRange() {
   final apiStartDate = formatterApi.format(firstDayOfMonth);
   final apiEndDate = formatterApi.format(lastDayOfMonth);
 
-  sharedPreferencesController.saveString(
-      PrefKeys.START_DATE_FILTER, apiStartDate);
-  sharedPreferencesController.saveString(PrefKeys.END_DATE_FILTER, apiEndDate);
-  sharedPreferencesController.saveString(
-      PrefKeys.SELECTED_DATE_FILTER, "This Month");
-  sharedPreferencesController.saveString(
-      PrefKeys.FILTER_DATES, "$formattedFirstDay to $formattedLastDay");
+  SharedPreferencesHelper.saveString(PrefKeys.START_DATE_FILTER, apiStartDate);
+  SharedPreferencesHelper.saveString(PrefKeys.END_DATE_FILTER, apiEndDate);
+  SharedPreferencesHelper.saveString(PrefKeys.SELECTED_DATE_FILTER, "This Month");
+  SharedPreferencesHelper.saveString(PrefKeys.FILTER_DATES, "$formattedFirstDay to $formattedLastDay");
 
   return '$formattedFirstDay to $formattedLastDay';
 }
@@ -136,13 +124,10 @@ String getLastMonthDateRange() {
   final apiStartDate = formatterApi.format(firstDayOfLastMonth);
   final apiEndDate = formatterApi.format(lastDayOfLastMonth);
 
-  sharedPreferencesController.saveString(
-      PrefKeys.START_DATE_FILTER, apiStartDate);
-  sharedPreferencesController.saveString(PrefKeys.END_DATE_FILTER, apiEndDate);
-  sharedPreferencesController.saveString(
-      PrefKeys.SELECTED_DATE_FILTER, "Last Month");
-  sharedPreferencesController.saveString(
-      PrefKeys.FILTER_DATES, "$formattedFirstDay to $formattedLastDay");
+  SharedPreferencesHelper.saveString(PrefKeys.START_DATE_FILTER, apiStartDate);
+  SharedPreferencesHelper.saveString(PrefKeys.END_DATE_FILTER, apiEndDate);
+  SharedPreferencesHelper.saveString(PrefKeys.SELECTED_DATE_FILTER, "Last Month");
+  SharedPreferencesHelper.saveString(PrefKeys.FILTER_DATES, "$formattedFirstDay to $formattedLastDay");
 
   return '$formattedFirstDay to $formattedLastDay';
 }
@@ -161,13 +146,10 @@ String getLastNinetyDaysDateRange() {
   final apiStartDate = formatterApi.format(startDate);
   final apiEndDate = formatterApi.format(endDate);
 
-  sharedPreferencesController.saveString(
-      PrefKeys.START_DATE_FILTER, apiStartDate);
-  sharedPreferencesController.saveString(PrefKeys.END_DATE_FILTER, apiEndDate);
-  sharedPreferencesController.saveString(
-      PrefKeys.SELECTED_DATE_FILTER, "Last 90 Days");
-  sharedPreferencesController.saveString(
-      PrefKeys.FILTER_DATES, "$formattedStartDate to $formattedEndDate");
+  SharedPreferencesHelper.saveString(PrefKeys.START_DATE_FILTER, apiStartDate);
+  SharedPreferencesHelper.saveString(PrefKeys.END_DATE_FILTER, apiEndDate);
+  SharedPreferencesHelper.saveString(PrefKeys.SELECTED_DATE_FILTER, "Last 90 Days");
+  SharedPreferencesHelper.saveString(PrefKeys.FILTER_DATES, "$formattedStartDate to $formattedEndDate");
 
   return '$formattedStartDate to $formattedEndDate';
 }
@@ -186,13 +168,10 @@ String getCurrentYearDateRange() {
   final apiStartDate = formatterApi.format(firstDayOfYear);
   final apiEndDate = formatterApi.format(lastDayOfYear);
 
-  sharedPreferencesController.saveString(
-      PrefKeys.START_DATE_FILTER, apiStartDate);
-  sharedPreferencesController.saveString(PrefKeys.END_DATE_FILTER, apiEndDate);
-  sharedPreferencesController.saveString(
-      PrefKeys.SELECTED_DATE_FILTER, "This Year");
-  sharedPreferencesController.saveString(
-      PrefKeys.FILTER_DATES, "$formattedFirstDay to $formattedLastDay");
+  SharedPreferencesHelper.saveString(PrefKeys.START_DATE_FILTER, apiStartDate);
+  SharedPreferencesHelper.saveString(PrefKeys.END_DATE_FILTER, apiEndDate);
+  SharedPreferencesHelper.saveString(PrefKeys.SELECTED_DATE_FILTER, "This Year");
+  SharedPreferencesHelper.saveString(PrefKeys.FILTER_DATES, "$formattedFirstDay to $formattedLastDay");
 
   return '$formattedFirstDay to $formattedLastDay';
 }
@@ -243,14 +222,10 @@ Future<String> selectCustomDateRange(BuildContext context) async {
     final apiStartDate = formatterApi.format(startDate);
     final apiEndDate = formatterApi.format(endDate);
 
-    sharedPreferencesController.saveString(
-        PrefKeys.START_DATE_FILTER, apiStartDate);
-    sharedPreferencesController.saveString(
-        PrefKeys.END_DATE_FILTER, apiEndDate);
-    sharedPreferencesController.saveString(
-        PrefKeys.SELECTED_DATE_FILTER, "Custom Range");
-    sharedPreferencesController.saveString(
-        PrefKeys.FILTER_DATES, "$formattedStartDate to $formattedEndDate");
+    SharedPreferencesHelper.saveString(PrefKeys.START_DATE_FILTER, apiStartDate);
+    SharedPreferencesHelper.saveString(PrefKeys.END_DATE_FILTER, apiEndDate);
+    SharedPreferencesHelper.saveString(PrefKeys.SELECTED_DATE_FILTER, "Custom Range");
+    SharedPreferencesHelper.saveString(PrefKeys.FILTER_DATES, "$formattedStartDate to $formattedEndDate");
 
     return '$formattedStartDate to $formattedEndDate';
   }

@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:servefirst_admin/constnts/constants.dart';
-import 'package:servefirst_admin/controller/controllers.dart';
-import 'package:servefirst_admin/model/response/response_list/responses_data.dart';
 import 'package:servefirst_admin/theme/app_theme.dart';
-import 'package:servefirst_admin/view/survey_responses/model/survey_responses.dart';
 
 class SurveyResponseListViewItem extends StatelessWidget {
   const SurveyResponseListViewItem({

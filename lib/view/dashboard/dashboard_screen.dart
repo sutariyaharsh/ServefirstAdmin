@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:servefirst_admin/component/svg_icon.dart';
@@ -14,57 +15,68 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(DashboardController());
     return GetBuilder<DashboardController>(
-        builder: (controller) =>
-            Scaffold(
-              extendBody: true,
-              body: SafeArea(
-                top: false,
-                child: IndexedStack(
-                  index: controller.tabIndex,
-                  children: const [
-                    ReportScreen(),
-                    ProfileScreen()
+        builder: (controller) => WillPopScope(
+              onWillPop: () async {
+                await SystemChannels.platform
+                    .invokeMethod('SystemNavigator.pop');
+                return true;
+              },
+              child: Scaffold(
+                extendBody: true,
+                body: SafeArea(
+                  top: false,
+                  child: IndexedStack(
+                    index: controller.tabIndex,
+                    children: const [ReportScreen(), ProfileScreen()],
+                  ),
+                ),
+                bottomNavigationBar: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: 0.5.h,
+                      color: AppTheme.lightParticlesColor,
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(top: 8.h),
+                      color: Colors.white,
+                      child: BottomNavigationBar(
+                        backgroundColor: Colors.transparent,
+                        onTap: (val) {
+                          controller.updateIndex(val);
+                        },
+                        currentIndex: controller.tabIndex,
+                        unselectedFontSize: 12.sp,
+                        selectedFontSize: 12.sp,
+                        type: BottomNavigationBarType.fixed,
+                        selectedItemColor: AppTheme.lightPrimaryColor,
+                        unselectedItemColor: AppTheme.lightAccentColor,
+                        elevation: 0,
+                        items: [
+                          BottomNavigationBarItem(
+                              icon: Container(
+                                  padding: EdgeInsets.only(bottom: 6.h),
+                                  child: SvgIcon(assetImage: icReport)),
+                              label: sReport),
+                          BottomNavigationBarItem(
+                              icon: Container(
+                                  padding: EdgeInsets.only(bottom: 6.h),
+                                  child: const Icon(
+                                      Icons.account_circle_outlined)),
+                              label: sProfile),
+                        ],
+                        selectedIconTheme: IconThemeData(
+                          color: AppTheme.lightPrimaryColor,
+                        ),
+                        unselectedIconTheme:
+                            IconThemeData(color: AppTheme.lightAccentColor),
+                      ),
+                    ),
                   ],
                 ),
-              ),
-              bottomNavigationBar: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: 0.5.h,
-                    color: AppTheme.lightParticlesColor,
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(top: 8.h),
-                    color: Colors.white,
-                    child: BottomNavigationBar(
-                      backgroundColor: Colors.transparent,
-                      onTap: (val) {
-                        controller.updateIndex(val);
-                      },
-                      currentIndex: controller.tabIndex,
-                      unselectedFontSize: 12.sp,
-                      selectedFontSize: 12.sp,
-                      type: BottomNavigationBarType.fixed,
-                      selectedItemColor: AppTheme.lightPrimaryColor,
-                      unselectedItemColor: AppTheme.lightAccentColor,
-                      elevation: 0,
-                      items: [
-                        BottomNavigationBarItem(icon: Container(
-                            padding: EdgeInsets.only(bottom: 6.h),
-                            child: SvgIcon(assetImage: icReport)),label: sReport),
-                        BottomNavigationBarItem(icon: Container(
-                            padding: EdgeInsets.only(bottom: 6.h),
-                            child: const Icon(Icons.account_circle_outlined)),label: sProfile),
-                      ],
-                      selectedIconTheme: IconThemeData(color: AppTheme.lightPrimaryColor,),
-                      unselectedIconTheme:
-                      IconThemeData(color: AppTheme.lightAccentColor),
-                    ),
-                  ),
-                ],
               ),
             ));
   }

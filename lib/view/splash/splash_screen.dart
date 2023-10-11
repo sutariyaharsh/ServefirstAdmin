@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:servefirst_admin/component/svg_icon.dart';
 import 'package:servefirst_admin/constnts/image_strings.dart';
-import 'package:servefirst_admin/controller/controllers.dart';
 import 'package:servefirst_admin/theme/app_theme.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -9,7 +8,6 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    splashController.startAnimation();
     return Scaffold(
       extendBody: true,
       backgroundColor: AppTheme.lightPrimaryColor,

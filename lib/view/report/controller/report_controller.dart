@@ -1,15 +1,14 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:servefirst_admin/constnts/constants.dart';
-import 'package:servefirst_admin/controller/controllers.dart';
+import 'package:servefirst_admin/controller/shared_preferences_helper.dart';
 import 'package:servefirst_admin/model/request/location_surveys_request.dart';
 import 'package:servefirst_admin/model/request/survey_dashboard_request.dart';
 import 'package:servefirst_admin/model/response/location_survey/employee.dart';
@@ -42,20 +41,29 @@ class ReportController extends GetxController {
   RxList<Survey> surveyList = List<Survey>.empty(growable: true).obs;
   late Position currentPosition;
 
+  RxString filterTitle = "".obs;
+  RxString filterDates = "".obs;
+
   @override
   void onInit() async {
     await _localLoginService.init();
     await _localEmployeeService.init();
     await _localGetSurveyDashboardDataService.init();
     await _localGetLocationSurveysService.init();
-    if ((sharedPreferencesController
-            .getString(PrefKeys.START_DATE_FILTER)
-            .isEmpty) &&
-        (sharedPreferencesController
-            .getString(PrefKeys.END_DATE_FILTER)
-            .isEmpty)) {
+    if (((await SharedPreferencesHelper.getString(PrefKeys.START_DATE_FILTER) ?? "").isEmpty) &&
+        ((await SharedPreferencesHelper.getString(PrefKeys.END_DATE_FILTER) ?? "").isEmpty)) {
       getThisMonthDateRange();
     }
+
+    if (((await SharedPreferencesHelper.getString(PrefKeys.SELECTED_DATE_FILTER) ?? "").isEmpty) &&
+        ((await SharedPreferencesHelper.getString(PrefKeys.FILTER_DATES) ?? "").isEmpty)) {
+      filterTitle.value = "This Month";
+      filterDates.value = getThisMonthDateRange();
+    }else {
+      filterTitle.value = await SharedPreferencesHelper.getString(PrefKeys.SELECTED_DATE_FILTER) ?? "";
+      filterDates.value = await SharedPreferencesHelper.getString(PrefKeys.FILTER_DATES) ?? "";
+    }
+
     currentPosition = await LocationService.getCurrentLocation();
 
     totalSurveys.value = _localGetSurveyDashboardDataService
@@ -72,9 +80,11 @@ class ReportController extends GetxController {
         0;
 
     if (_localGetSurveyDashboardDataService.getSurveyDashboardData() == null) {
-      getSurveyDashboardData();
+      await getSurveyDashboardData();
     }
-    locationList.assignAll(_localGetLocationSurveysService.getLocationSurveyData()?.location ?? []);
+    locationList.assignAll(
+        _localGetLocationSurveysService.getLocationSurveyData()?.location ??
+            []);
 
     super.onInit();
   }
@@ -90,10 +100,9 @@ class ReportController extends GetxController {
           latitude: currentPosition.latitude,
           longitude: currentPosition.longitude);
 
-      if (kDebugMode) {
-        print(
-            '*getLocationSurveys, Request : ${jsonEncode(locationSurveysRequest)}');
-      }
+      log("Request : ${jsonEncode(locationSurveysRequest)}",
+          name: "getLocationSurveys");
+
       var result = await RemoteGetLocationSurveysService().getLocationSurveys(
           locationSurveysRequest: locationSurveysRequest,
           token: _localLoginService.getToken() ?? "");
@@ -111,7 +120,8 @@ class ReportController extends GetxController {
             for (var employee in location.employee) {
               final imageUrl = employee.image;
               final imageResponse = await http.get(Uri.parse(imageUrl));
-              final imagePath = await saveImageLocally(imageResponse.bodyBytes, employee.id);
+              final imagePath =
+                  await saveImageLocally(imageResponse.bodyBytes, employee.id);
 
               Employee _employee = Employee();
               _employee.locationId = employee.locationId;
@@ -124,17 +134,21 @@ class ReportController extends GetxController {
           }
 
           _localEmployeeService.assignAllEmployees(employees: employees);
+          log("Response : ${jsonEncode(_localGetLocationSurveysService.getLocationSurveyData()!.global!.length)}",
+              name: "getLocationSurveys");
+          log("Employees : ${jsonEncode(_localEmployeeService.getEmployees())}",
+              name: "getEmployees");
           EasyLoading.showSuccess("Success!");
         } else {
           EasyLoading.showError('Something wrong. Try again!');
         }
       } else {
-        debugPrint("Result : ${result.statusCode} ** ${result.body}");
+        log("Response : ${result.statusCode} ** ${jsonEncode(result.body)}",
+            name: "getLocationSurveys");
         EasyLoading.showError('wrong. Try again!');
       }
     } catch (e) {
-      debugPrint('Error : ${e.toString()}');
-      EasyLoading.showError('Something wrong. Try again!');
+      log("catch : ${e.toString()}", name: "getLocationSurveys");
     } finally {
       EasyLoading.dismiss();
     }
@@ -154,8 +168,7 @@ class ReportController extends GetxController {
       if (response.statusCode == 200) {
         // Get the temporary directory for the app
         final appDir = await getTemporaryDirectory();
-        final imagePath =
-            "${appDir.path}/$id.png";
+        final imagePath = "${appDir.path}/$id.png";
 
         // Write the image data to the file
         final file = File(imagePath);
@@ -172,8 +185,7 @@ class ReportController extends GetxController {
     return imageUrl;
   }
 
-
-  void getSurveyDashboardData() async {
+  Future<void> getSurveyDashboardData() async {
     try {
       EasyLoading.show(
         dismissOnTap: false,
@@ -181,17 +193,18 @@ class ReportController extends GetxController {
       SurveyDashboardRequest surveyDashboardRequest = SurveyDashboardRequest(
           userId: _localLoginService.getUser()!.sId ?? "",
           companyId: _localLoginService.getUser()!.companyId ?? "",
-          startDate:
-              sharedPreferencesController.getString(PrefKeys.START_DATE_FILTER),
-          endDate:
-              sharedPreferencesController.getString(PrefKeys.END_DATE_FILTER),
+          startDate: await SharedPreferencesHelper.getString(
+                  PrefKeys.START_DATE_FILTER) ??
+              "",
+          endDate: await SharedPreferencesHelper.getString(
+                  PrefKeys.END_DATE_FILTER) ??
+              "",
           latitude: currentPosition.latitude,
           longitude: currentPosition.longitude);
 
-      if (kDebugMode) {
-        print(
-            '*getSurveyDashboardData, Request : ${jsonEncode(surveyDashboardRequest)}');
-      }
+      log("Request : ${jsonEncode(surveyDashboardRequest)}",
+          name: "getSurveyDashboardData");
+
       var result = await RemoteGetSurveyDashboardDataService()
           .getSurveyDashboardData(
               surveyDashboardRequest: surveyDashboardRequest,
@@ -209,19 +222,27 @@ class ReportController extends GetxController {
               surveyDashboardResponse.data?.totalResponses?.toInt() ?? 0;
           responseAverage.value =
               surveyDashboardResponse.data?.responseAverage ?? 0;
+          log("Response : ${jsonEncode(_localGetSurveyDashboardDataService.getSurveyDashboardData())}",
+              name: "getSurveyDashboardData");
           EasyLoading.showSuccess("Success!");
         } else {
           EasyLoading.showError('Something wrong. Try again!');
         }
       } else {
-        debugPrint("Result : ${result.statusCode} ** ${result.body}");
+        log("Response : ${result.statusCode} ** ${jsonEncode(result.body)}",
+            name: "getSurveyDashboardData");
         EasyLoading.showError('wrong. Try again!');
       }
     } catch (e) {
-      debugPrint(e.toString());
-      EasyLoading.showError('Something wrong. Try again!');
+      log("catch : ${e.toString()}", name: "getSurveyDashboardData");
     } finally {
       EasyLoading.dismiss();
     }
+  }
+
+  Future<void> updateFilterData() async {
+    filterTitle.value = "Custom Range";
+    filterDates.value = await selectCustomDateRange(Get.context!);
+    await getSurveyDashboardData();
   }
 }

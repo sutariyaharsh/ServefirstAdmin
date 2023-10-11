@@ -1,14 +1,12 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:servefirst_admin/component/svg_icon.dart';
-import 'package:servefirst_admin/constnts/constants.dart';
 import 'package:servefirst_admin/constnts/image_strings.dart';
 import 'package:servefirst_admin/model/response/location_survey/survey.dart';
-import 'package:servefirst_admin/route/app_route.dart';
 import 'package:servefirst_admin/theme/app_theme.dart';
+import 'package:servefirst_admin/view/response_details/response_details_screen.dart';
 import 'package:servefirst_admin/view/survey/survey_screen.dart';
 import 'package:servefirst_admin/view/survey_responses/component/survey_response_list_view_item.dart';
 import 'package:servefirst_admin/view/survey_responses/controller/survey_responses_controller.dart';
@@ -18,6 +16,7 @@ class SurveyResponsesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(SurveyResponsesController());
     return GetBuilder<SurveyResponsesController>(
       builder: (controller) => Scaffold(
         extendBody: true,
@@ -77,7 +76,7 @@ class SurveyResponsesScreen extends StatelessWidget {
               SizedBox(height: 10.h),
               Expanded(
                 child: SingleChildScrollView(
-                  physics: BouncingScrollPhysics(),
+                  physics: const BouncingScrollPhysics(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -174,10 +173,7 @@ class SurveyResponsesScreen extends StatelessWidget {
                                         (BuildContext context, int index) {
                                       return GestureDetector(
                                           onTap: () {
-                                            Get.toNamed(
-                                                    AppRoute.response_details,
-                                                    arguments: index)!
-                                                .then((value) {});
+                                            Get.to(()=> ResponseDetailsScreen(index: index));
                                           },
                                           child: SurveyResponseListViewItem(
                                               surveyName: controller
