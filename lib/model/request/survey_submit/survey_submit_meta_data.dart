@@ -1,7 +1,16 @@
+import 'package:hive/hive.dart';
+
+part 'survey_submit_meta_data.g.dart';
+
+@HiveType(typeId: 17)
 class SurveySubmitMetaData {
+  @HiveField(0)
   String? surveyId;
+  @HiveField(1)
   String? locationId;
+  @HiveField(2)
   String? responseUserId;
+  @HiveField(3)
   String? tagId;
 
   SurveySubmitMetaData({

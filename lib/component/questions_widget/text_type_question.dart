@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -18,7 +17,6 @@ class TextTypeQuestion extends StatefulWidget {
       required this.index,
       required this.onTextEntered,
       required this.surveyType,
-      required this.isMultiSelectRequired,
       required this.onCommentTextEntered})
       : super(key: key);
 
@@ -26,7 +24,6 @@ class TextTypeQuestion extends StatefulWidget {
   final int index;
   final Function(String) onTextEntered;
   final Function(String) onCommentTextEntered;
-  final Function(bool) isMultiSelectRequired;
   final String surveyType;
   final SurveyController surveyController;
 
@@ -45,20 +42,19 @@ class _TextTypeQuestionState extends State<TextTypeQuestion> {
     super.initState();
 
     // Initialize the _textController with the initial value from myController.value
-    if (widget.surveyController.surveyJsonDataMap[widget.question.sId!]
-        ?.value !=
-        null) {
-      _textController.text = widget.surveyController
-          .surveyJsonDataMap[widget.question.sId!]?.value as String;
+    if (widget.surveyController.surveyJsonDataMap[widget.question.sId!]?.value != null) {
+      _textController.text = widget.surveyController.surveyJsonDataMap[widget.question.sId!]?.value as String;
     }
 
     // Observe changes in myController.value and update _textController accordingly
     ever(widget.surveyController.surveyJsonDataMap, (_) {
       final surveyData = widget.surveyController.surveyJsonDataMap[widget.question.sId!];
       if (surveyData != null) {
-        setState(() {
-          _textController.text = surveyData.value.toString(); // Assuming 'value' is not an RxString
-        });
+        if (mounted) {
+          setState(() {
+            _textController.text = surveyData.value.toString(); // Assuming 'value' is not an RxString
+          });
+        }
       }
     });
   }
@@ -78,16 +74,6 @@ class _TextTypeQuestionState extends State<TextTypeQuestion> {
 
   @override
   Widget build(BuildContext context) {
-    /*if (widget.surveyController.surveyJsonDataMap[widget.question.sId!]
-        ?.value !=
-        null) {
-      _textController.text = widget.surveyController
-          .surveyJsonDataMap[widget.question.sId!]?.value as String;
-    }*/
-    setState(() {
-      widget.isMultiSelectRequired(widget.question.required ?? false);
-
-    });
     return GetBuilder<SurveyController>(
       builder: (controller) => Padding(
         padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
@@ -99,25 +85,30 @@ class _TextTypeQuestionState extends State<TextTypeQuestion> {
               children: [
                 Text(
                   "${widget.index + 1}.",
-                  style: TextStyle(
-                      fontSize: 16.sp,
-                      color: AppTheme.lightPrimaryColor,
-                      fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 16.sp, color: AppTheme.lightPrimaryColor, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(width: 5.h),
                 Expanded(
                   child: Text(
                     "${widget.question.text}",
-                    style: TextStyle(
-                        height: 1.3,
-                        fontSize: 14.sp,
-                        color: AppTheme.lightPrimaryColor,
-                        fontWeight: FontWeight.w500),
+                    style: TextStyle(height: 1.3, fontSize: 14.sp, color: AppTheme.lightPrimaryColor, fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 15.h),
+            SizedBox(height: 5.h),
+            if (widget.question.required ?? false)
+              Obx(
+                () => controller.surveyJsonDataMap[widget.question.sId!]?.value == null
+                    ? Text("* Please Enter your thoughts",
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          color: AppTheme.lightRed,
+                          fontWeight: FontWeight.w600,
+                        ))
+                    : Container(),
+              ),
+            SizedBox(height: 10.h),
             Container(
               height: 80.h,
               padding: EdgeInsets.symmetric(horizontal: 10.w),
@@ -133,19 +124,13 @@ class _TextTypeQuestionState extends State<TextTypeQuestion> {
                 },
                 textDirection: TextDirection.ltr,
                 cursorColor: AppTheme.lightPrimaryColor,
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w500),
+                style: TextStyle(color: Colors.black, fontSize: 13.sp, fontWeight: FontWeight.w500),
                 minLines: 1,
                 // Set this to control the minimum number of lines to display
                 maxLines: null,
                 decoration: InputDecoration(
                     hintText: "Type here...",
-                    hintStyle: TextStyle(
-                        color: AppTheme.lightDarkGray,
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w500),
+                    hintStyle: TextStyle(color: AppTheme.lightDarkGray, fontSize: 13.sp, fontWeight: FontWeight.w500),
                     border: InputBorder.none),
               ),
             ),
@@ -164,10 +149,7 @@ class _TextTypeQuestionState extends State<TextTypeQuestion> {
                         children: [
                           Text(
                             "Add Comments",
-                            style: TextStyle(
-                                color: AppTheme.lightPrimaryColor,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w600),
+                            style: TextStyle(color: AppTheme.lightPrimaryColor, fontSize: 14.sp, fontWeight: FontWeight.w600),
                           ),
                           Icon(
                             Icons.add,
@@ -185,8 +167,7 @@ class _TextTypeQuestionState extends State<TextTypeQuestion> {
                           borderRadius: BorderRadius.all(
                             Radius.circular(6.r),
                           ),
-                          border: Border.all(
-                              width: 1.w, color: AppTheme.lightGray)),
+                          border: Border.all(width: 1.w, color: AppTheme.lightGray)),
                       child: Column(
                         children: [
                           Column(
@@ -198,19 +179,13 @@ class _TextTypeQuestionState extends State<TextTypeQuestion> {
                                   controller: _commentController,
                                   textDirection: TextDirection.ltr,
                                   cursorColor: AppTheme.lightPrimaryColor,
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 13.sp,
-                                      fontWeight: FontWeight.w500),
+                                  style: TextStyle(color: Colors.black, fontSize: 13.sp, fontWeight: FontWeight.w500),
                                   minLines: 1,
                                   // Set this to control the minimum number of lines to display
                                   maxLines: null,
                                   decoration: InputDecoration(
                                       hintText: "Enter Comment",
-                                      hintStyle: TextStyle(
-                                          color: AppTheme.lightDarkGray,
-                                          fontSize: 13.sp,
-                                          fontWeight: FontWeight.w500),
+                                      hintStyle: TextStyle(color: AppTheme.lightDarkGray, fontSize: 13.sp, fontWeight: FontWeight.w500),
                                       border: InputBorder.none),
                                 ),
                               ),
@@ -218,12 +193,9 @@ class _TextTypeQuestionState extends State<TextTypeQuestion> {
                                 color: AppTheme.lightPrimaryColor,
                                 onPressed: () {
                                   if (_commentController.text.trim().isEmpty) {
-                                    showSnackBar(
-                                        message:
-                                            "Comment should not be empty!");
+                                    showSnackBar(message: "Comment should not be empty!");
                                   } else {
-                                    widget.onCommentTextEntered(
-                                        _commentController.text);
+                                    widget.onCommentTextEntered(_commentController.text);
                                     _showCommentText();
                                   }
                                 },
@@ -242,8 +214,7 @@ class _TextTypeQuestionState extends State<TextTypeQuestion> {
                           borderRadius: BorderRadius.all(
                             Radius.circular(6.r),
                           ),
-                          border: Border.all(
-                              width: 1.w, color: AppTheme.lightGray)),
+                          border: Border.all(width: 1.w, color: AppTheme.lightGray)),
                       child: Row(
                         children: [
                           Expanded(
@@ -251,10 +222,7 @@ class _TextTypeQuestionState extends State<TextTypeQuestion> {
                               padding: EdgeInsets.symmetric(horizontal: 10.w),
                               child: Text(
                                 _commentController.text,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 12.sp,
-                                    color: Colors.black),
+                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12.sp, color: Colors.black),
                               ),
                             ),
                           ),
@@ -268,9 +236,7 @@ class _TextTypeQuestionState extends State<TextTypeQuestion> {
                                 _isShowCommentInput = false;
                               });
                             },
-                            icon: Icon(Icons.cancel,
-                                color: AppTheme.lightPrimaryColor
-                                    .withOpacity(0.8)),
+                            icon: Icon(Icons.cancel, color: AppTheme.lightPrimaryColor.withOpacity(0.8)),
                           ),
                         ],
                       ),
@@ -285,10 +251,7 @@ class _TextTypeQuestionState extends State<TextTypeQuestion> {
                       children: [
                         Text(
                           "Upload Image",
-                          style: TextStyle(
-                              color: AppTheme.lightPrimaryColor,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600),
+                          style: TextStyle(color: AppTheme.lightPrimaryColor, fontSize: 14.sp, fontWeight: FontWeight.w600),
                         ),
                         Icon(
                           Icons.add,
@@ -303,19 +266,12 @@ class _TextTypeQuestionState extends State<TextTypeQuestion> {
                     () => ListView.builder(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: controller
-                              .imageFileAuditionListMap[widget.question.sId]
-                              ?.length ??
-                          0,
+                      itemCount: controller.imageFileAuditionListMap[widget.question.sId]?.length ?? 0,
                       itemBuilder: (context, index) {
                         final pickedImage = /*File(*/
-                            controller.imageFileAuditionListMap[
-                                widget.question.sId]![index]/*)*/;
+                            controller.imageFileAuditionListMap[widget.question.sId]![index] /*)*/;
                         return AuditionImageListItem(
-                            pickedImage: pickedImage,
-                            onDeleteClick: () =>
-                                controller.removeImageToAuditionMap(
-                                    widget.question.sId!, index));
+                            pickedImage: pickedImage, onDeleteClick: () => controller.removeImageToAuditionMap(widget.question.sId!, index));
                       },
                     ),
                   ),
@@ -338,12 +294,10 @@ class _TextTypeQuestionState extends State<TextTypeQuestion> {
             children: <Widget>[
               _buildOptionButton('Camera', () {
                 Navigator.of(context).pop();
-                widget.surveyController.pickImage(ImageSource.camera,
-                    widget.question.questionType!, widget.question.sId!);
+                widget.surveyController.pickImage(ImageSource.camera, widget.question.questionType!, widget.question.sId!);
               }),
               _buildOptionButton('Gallery', () {
-                widget.surveyController.pickImage(ImageSource.gallery,
-                    widget.question.questionType!, widget.question.sId!);
+                widget.surveyController.pickImage(ImageSource.gallery, widget.question.questionType!, widget.question.sId!);
               }),
               _buildOptionButton('Cancel', () {
                 // Handle Cancel option
@@ -400,12 +354,10 @@ class AuditionImageListItem extends StatelessWidget {
         ),
         title: Text(
           /*pickedImage.path.split(Platform.pathSeparator)
-                                  .last*/"Image Name",
+                                  .last*/
+          "Image Name",
           maxLines: 1,
-          style: TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 12.sp,
-              color: AppTheme.lightGrayTextColor),
+          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12.sp, color: AppTheme.lightGrayTextColor),
         ),
         // Replace with the actual image name
         trailing: GestureDetector(

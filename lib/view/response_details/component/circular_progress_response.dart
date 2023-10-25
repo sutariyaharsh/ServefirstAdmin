@@ -41,17 +41,11 @@ class CircularProgressResponse extends StatelessWidget {
               children: [
                 Text(
                   valueText,
-                  style: TextStyle(
-                      fontSize: 14.sp,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w400),
+                  style: TextStyle(fontSize: 14.sp, color: Colors.black, fontWeight: FontWeight.w400),
                 ),
                 Text(
                   subtitle,
-                  style: TextStyle(
-                      fontSize: 10.sp,
-                      color: AppTheme.lightTextColor,
-                      fontWeight: FontWeight.w400),
+                  style: TextStyle(fontSize: 10.sp, color: AppTheme.lightTextColor, fontWeight: FontWeight.w400),
                 ),
               ],
             ),
@@ -60,10 +54,7 @@ class CircularProgressResponse extends StatelessWidget {
         SizedBox(height: 12.h),
         Text(
           title,
-          style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w500,
-              color: AppTheme.lightGrayTextColor),
+          style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, color: AppTheme.lightGrayTextColor),
         ),
       ],
     );

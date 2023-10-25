@@ -18,10 +18,15 @@ class LocationSurveys {
   }
 
   int? get status => _status;
+
   set status(int? status) => _status = status;
+
   String? get message => _message;
+
   set message(String? message) => _message = message;
+
   LocationSurveyData? get data => _data;
+
   set data(LocationSurveyData? data) => _data = data;
 
   LocationSurveys.fromJson(Map<String, dynamic> json) {

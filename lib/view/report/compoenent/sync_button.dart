@@ -6,9 +6,13 @@ import 'package:servefirst_admin/theme/app_theme.dart';
 class SyncButton extends StatelessWidget {
   SyncButton({
     super.key,
-    required this.onTap,
+    required this.onTap, required this.fontSize, required this.borderRadius, required this.iconSize,
   });
+
   VoidCallback onTap;
+  final double fontSize;
+  final double borderRadius;
+  final double iconSize;
 
   @override
   Widget build(BuildContext context) {
@@ -18,18 +22,17 @@ class SyncButton extends StatelessWidget {
         backgroundColor: AppTheme.lightPrimaryColor,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(17.r),
+          borderRadius: BorderRadius.circular(borderRadius),
         ),
       ),
       child: Row(
         children: [
           Text(
             sSync,
-            style: TextStyle(
-                fontSize: 12.sp, fontWeight: FontWeight.w500, color: AppTheme.lightWhiteTextColor),
+            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w500, color: AppTheme.lightWhiteTextColor),
           ),
           SizedBox(width: 2.w),
-          Icon(Icons.sync, size: 18.sp),
+          Icon(Icons.sync, size: iconSize),
         ],
       ),
     );

@@ -14,12 +14,19 @@ class LoginData {
   }
 
   User? get user => _user;
+
   set user(User? user) => _user = user;
+
   String? get token => _token;
+
   set token(String? token) => _token = token;
 
   LoginData.fromJson(Map<String, dynamic> json) {
-    _user = json['user'] != null ? new User.fromJson(json['user']) : json['profile'] != null ? new User.fromJson(json['profile']) : null;
+    _user = json['user'] != null
+        ? new User.fromJson(json['user'])
+        : json['profile'] != null
+            ? new User.fromJson(json['profile'])
+            : null;
     _token = json['token'];
   }
 

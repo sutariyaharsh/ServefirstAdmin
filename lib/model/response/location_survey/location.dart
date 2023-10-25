@@ -3,6 +3,7 @@ import 'package:servefirst_admin/model/response/location_survey/employee.dart';
 import 'package:servefirst_admin/model/response/location_survey/survey.dart';
 
 part 'location.g.dart';
+
 @HiveType(typeId: 5)
 class Location {
   @HiveField(0)
@@ -28,15 +29,15 @@ class Location {
 
   Location(
       {String? sId,
-        String? companyId,
-        String? name,
-        String? address1,
-        String? address2,
-        double? longitude,
-        double? latitude,
-        List<Employee>? employee,
-        String? distance,
-        List<Survey>? surveys}) {
+      String? companyId,
+      String? name,
+      String? address1,
+      String? address2,
+      double? longitude,
+      double? latitude,
+      List<Employee>? employee,
+      String? distance,
+      List<Survey>? surveys}) {
     if (sId != null) {
       this._sId = sId;
     }
@@ -70,24 +71,43 @@ class Location {
   }
 
   String? get sId => _sId;
+
   set sId(String? sId) => _sId = sId;
+
   String? get companyId => _companyId;
+
   set companyId(String? companyId) => _companyId = companyId;
+
   String? get name => _name;
+
   set name(String? name) => _name = name;
+
   String? get address1 => _address1;
+
   set address1(String? address1) => _address1 = address1;
+
   String? get address2 => _address2;
+
   set address2(String? address2) => _address2 = address2;
+
   double? get longitude => _longitude;
+
   set longitude(double? longitude) => _longitude = longitude;
+
   double? get latitude => _latitude;
+
   set latitude(double? latitude) => _latitude = latitude;
+
   List<Employee>? get employee => _employee;
+
   set employee(List<Employee>? employee) => _employee = employee;
+
   String? get distance => _distance;
+
   set distance(String? distance) => _distance = distance;
+
   List<Survey>? get surveys => _surveys;
+
   set surveys(List<Survey>? surveys) => _surveys = surveys;
 
   Location.fromJson(Map<String, dynamic> json) {

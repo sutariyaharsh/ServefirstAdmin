@@ -14,10 +14,7 @@ class RemoteGetLocationSurveysService {
   }) async {
     var response = await client.post(
       Uri.parse(remoteUrl),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": token
-      },
+      headers: {"Content-Type": "application/json", "Authorization": token},
       body: jsonEncode(locationSurveysRequest),
     );
     return response;

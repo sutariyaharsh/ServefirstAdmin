@@ -3,14 +3,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:servefirst_admin/theme/app_theme.dart';
 
 class ReportButton extends StatelessWidget {
-  ReportButton({
+  const ReportButton({
     required this.title,
     required this.onTap,
-    Key? key,
+    Key? key, required this.titleFontSize, required this.verticalPadding,
   }) : super(key: key);
 
   final String title;
   final VoidCallback onTap;
+  final double titleFontSize;
+  final double verticalPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -28,16 +30,9 @@ class ReportButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(22.r),
             ),
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 14.h),
+              padding: EdgeInsets.symmetric(vertical: verticalPadding),
               child: Center(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    color: AppTheme.lightWhiteTextColor,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 13.sp,
-                  ),
-                ),
+                child: Text(title, style: TextStyle(color: AppTheme.lightWhiteTextColor, fontWeight: FontWeight.w500, fontSize: titleFontSize)),
               ),
             ),
           ),

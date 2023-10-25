@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -46,10 +45,7 @@ class SurveyResponsesScreen extends StatelessWidget {
                           children: [
                             Text(
                               "This Month",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color: AppTheme.lightGrayTextColor,
-                                  fontSize: 12.sp),
+                              style: TextStyle(fontWeight: FontWeight.w500, color: AppTheme.lightGrayTextColor, fontSize: 12.sp),
                             ),
                             SizedBox(width: 5.w),
                             SvgIcon(
@@ -63,10 +59,7 @@ class SurveyResponsesScreen extends StatelessWidget {
                         SizedBox(height: 2.h),
                         Text(
                           "01-07-2023 to 31-01-2023",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                              fontSize: 12.sp),
+                          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black, fontSize: 12.sp),
                         ),
                       ],
                     ),
@@ -88,55 +81,33 @@ class SurveyResponsesScreen extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 20.w),
+                                    padding: EdgeInsets.symmetric(horizontal: 20.w),
                                     child: Text(
                                       "Saved Responses",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14.sp,
-                                          color: AppTheme.lightGrayTextColor),
+                                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp, color: AppTheme.lightGrayTextColor),
                                     ),
                                   ),
                                   ListView.builder(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
+                                    physics: const NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
                                     scrollDirection: Axis.vertical,
-                                    itemCount:
-                                        controller.savedResponsesList.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
+                                    itemCount: controller.savedResponsesList.length,
+                                    itemBuilder: (BuildContext context, int index) {
                                       return GestureDetector(
                                           onTap: () async {
-                                            Survey? survey = await controller
-                                                .getSurveyFromSurveyId(
-                                                    controller
-                                                        .savedResponsesList[
-                                                            index]
-                                                        .surveyId!,
-                                                    controller
-                                                        .savedResponsesList[
-                                                            index]
-                                                        .locationId!);
+                                            Survey? survey = await controller.getSurveyFromSurveyId(
+                                                controller.savedResponsesList[index].surveyId!, controller.savedResponsesList[index].locationId!);
                                             if (survey != null) {
                                               Get.to(() => SurveyScreen(
                                                   survey: survey,
-                                                  locationId: controller
-                                                      .savedResponsesList[index]
-                                                      .locationId!,
-                                                  saveSurveyPojo: controller
-                                                          .savedResponsesList[
-                                                      index]));
+                                                  locationId: controller.savedResponsesList[index].locationId!,
+                                                  saveSurveyPojo: controller.savedResponsesList[index],
+                                                  savedSurveyIndex: index));
                                             }
                                           },
                                           child: SurveyResponseListViewItem(
-                                              surveyName: controller
-                                                  .savedResponsesList[index]
-                                                  .surveyName!,
-                                              surveyCreatedAt: controller
-                                                  .savedResponsesList[index]
-                                                  .createdAt!,
+                                              surveyName: controller.savedResponsesList[index].surveyName!,
+                                              surveyCreatedAt: controller.savedResponsesList[index].createdAt!,
                                               onDeleteClick: () {},
                                               index: index));
                                     },
@@ -154,34 +125,24 @@ class SurveyResponsesScreen extends StatelessWidget {
                             padding: EdgeInsets.symmetric(horizontal: 20.w),
                             child: Text(
                               "Completed Responses",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14.sp,
-                                  color: AppTheme.lightGrayTextColor),
+                              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp, color: AppTheme.lightGrayTextColor),
                             ),
                           ),
                           Obx(
                             () => controller.responsesDataList.isNotEmpty
                                 ? ListView.builder(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
+                                    physics: const NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
                                     scrollDirection: Axis.vertical,
-                                    itemCount:
-                                        controller.responsesDataList.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
+                                    itemCount: controller.responsesDataList.length,
+                                    itemBuilder: (BuildContext context, int index) {
                                       return GestureDetector(
                                           onTap: () {
-                                            Get.to(()=> ResponseDetailsScreen(index: index));
+                                            Get.to(() => ResponseDetailsScreen(index: index));
                                           },
                                           child: SurveyResponseListViewItem(
-                                              surveyName: controller
-                                                  .responsesDataList[index]
-                                                  .survey!,
-                                              surveyCreatedAt: controller
-                                                  .responsesDataList[index]
-                                                  .createdAt!,
+                                              surveyName: controller.responsesDataList[index].survey!,
+                                              surveyCreatedAt: controller.responsesDataList[index].createdAt!,
                                               index: index));
                                     },
                                   )

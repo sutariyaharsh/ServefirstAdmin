@@ -4,8 +4,7 @@ import 'package:servefirst_admin/service/local_service/local_get_location_survey
 
 class LocationController extends GetxController {
   static LocationController instance = Get.find();
-  final LocalGetLocationSurveysService _localGetLocationSurveysService =
-  LocalGetLocationSurveysService();
+  final LocalGetLocationSurveysService _localGetLocationSurveysService = LocalGetLocationSurveysService();
   RxList<Location> locationList = List<Location>.empty(growable: true).obs;
 
   @override

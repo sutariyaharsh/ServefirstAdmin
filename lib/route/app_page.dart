@@ -5,10 +5,6 @@ import 'package:servefirst_admin/view/splash/splash_screen.dart';
 
 class AppPage {
   static var list = [
-    GetPage(
-        name: AppRoute.splash,
-        page: () => const SplashScreen(),
-        binding: SplashBinding()
-    ),
+    GetPage(name: AppRoute.splash, page: () => const SplashScreen(), binding: SplashBinding()),
   ];
 }

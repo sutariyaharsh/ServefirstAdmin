@@ -1,15 +1,19 @@
 import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:servefirst_admin/model/response/login/login.dart';
-import 'dart:io';
-import 'package:servefirst_admin/model/response/login/user.dart';
-import 'package:servefirst_admin/service/local_service/local_login_service.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:servefirst_admin/constnts/constants.dart';
+import 'package:servefirst_admin/controller/network_controller.dart';
+import 'package:servefirst_admin/model/response/login/login.dart';
+import 'package:servefirst_admin/model/response/login/user.dart';
+import 'package:servefirst_admin/service/local_service/local_login_service.dart';
 import 'package:servefirst_admin/service/remote_service/remote_edit_profile_service.dart';
 
 class EditProfileController extends GetxController {
@@ -32,7 +36,7 @@ class EditProfileController extends GetxController {
   @override
   void onInit() async {
     await _localLoginService.init();
-    print("token :- ${_localLoginService.getToken()}");
+    log("token : ${_localLoginService.getToken()}", name: "EditProfileController");
     loginUser.value = _localLoginService.getUser();
     nameController.value.text = loginUser.value?.name ?? "";
     phoneController.value.text = loginUser.value?.phone ?? "";
@@ -55,46 +59,44 @@ class EditProfileController extends GetxController {
   }
 
   Future<File?> _cropImage({required File imageFile}) async {
-    CroppedFile? croppedImage =
-        await ImageCropper().cropImage(sourcePath: imageFile.path);
+    CroppedFile? croppedImage = await ImageCropper().cropImage(sourcePath: imageFile.path);
     if (croppedImage == null) return null;
     return File(croppedImage.path);
   }
 
   void editUserProfile({required String name_, required String email_, required String phone_}) async {
-    try {
-      EasyLoading.show(
-        dismissOnTap: false,
-      );
+    if (NetworkController.isConnected) {
+      try {
+        EasyLoading.show(
+          dismissOnTap: false,
+        );
 
-      var result = await RemoteEditProfileService().editProfile(
-          imageFile: imageFile.value!,
-          name: name_,
-          email: email_,
-          phone: phone_,
-          token: _localLoginService.getToken()!);
-      if (result.statusCode == 200) {
-        var responseBody = await result.stream.bytesToString();
-        Login loginResponse = Login.fromJson(jsonDecode(responseBody));
-        if (loginResponse.status == 200) {
-          loginUser.value = loginResponse.data?.user;
-          await _localLoginService.addToken(
-              token: loginResponse.data?.token ?? '');
-          await _localLoginService.addUser(
-              user: loginResponse.data?.user ?? User());
-          print("userresponse :- ${jsonEncode(loginResponse.data?.user)}");
-          EasyLoading.showSuccess("Profile Updated!");
-        }else {
+        var result = await RemoteEditProfileService()
+            .editProfile(imageFile: imageFile.value!, name: name_, email: email_, phone: phone_, token: _localLoginService.getToken()!);
+        if (result.statusCode == 200) {
+          var responseBody = await result.stream.bytesToString();
+          Login loginResponse = Login.fromJson(jsonDecode(responseBody));
+          if (loginResponse.status == 200) {
+            loginUser.value = loginResponse.data?.user;
+            await _localLoginService.addToken(token: loginResponse.data?.token ?? '');
+            await _localLoginService.addUser(user: loginResponse.data?.user ?? User());
+            log("Response : ${jsonEncode(loginResponse.data?.user)}", name: "editProfile");
+            EasyLoading.showSuccess("Profile Updated!");
+          } else {
+            EasyLoading.showError('Something wrong. Try again!');
+          }
+        } else {
           EasyLoading.showError('Something wrong. Try again!');
         }
-      }else {
+      } catch (e) {
+        debugPrint(e.toString());
         EasyLoading.showError('Something wrong. Try again!');
+      } finally {
+        EasyLoading.dismiss();
       }
-    } catch (e) {
-      debugPrint(e.toString());
-      EasyLoading.showError('Something wrong. Try again!');
-    } finally {
-      EasyLoading.dismiss();
+    } else {
+      log('You\'re not connected to a network', name: "Network");
+      showNetworkErrorSnackBar();
     }
   }
 }

@@ -24,5 +24,6 @@ class LocalLoginService {
   }
 
   String? getToken() => _tokenBox.get('token');
+
   User? getUser() => _userBox.get('user');
 }

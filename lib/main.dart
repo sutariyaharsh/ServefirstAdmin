@@ -6,9 +6,12 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:servefirst_admin/bindings/app_bindings.dart';
+import 'package:servefirst_admin/model/local_response/offline_survey_pojo.dart';
 import 'package:servefirst_admin/model/local_response/save_survey_pojo.dart';
 import 'package:servefirst_admin/model/request/survey_submit/image_names.dart';
 import 'package:servefirst_admin/model/request/survey_submit/survey_submit_json_data.dart';
+import 'package:servefirst_admin/model/request/survey_submit/survey_submit_meta_data.dart';
+import 'package:servefirst_admin/model/request/survey_submit/survey_submit_response_data.dart';
 import 'package:servefirst_admin/model/response/location_survey/employee.dart';
 import 'package:servefirst_admin/model/response/location_survey/location.dart';
 import 'package:servefirst_admin/model/response/location_survey/location_survey_data.dart';
@@ -25,10 +28,11 @@ import 'package:servefirst_admin/route/app_page.dart';
 import 'package:servefirst_admin/route/app_route.dart';
 import 'package:servefirst_admin/theme/app_theme.dart';
 
+import 'controller/dependency_injection.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  String colorCode =
-      await fetchColorCodeFromBackend(); // Replace with your backend fetching logic
+  String colorCode = await fetchColorCodeFromBackend(); // Replace with your backend fetching logic
   Color newColor = Color(int.parse(colorCode, radix: 16)).withOpacity(1.0);
   AppTheme.updateLightPrimaryColor(newColor);
   await Hive.initFlutter();
@@ -49,6 +53,9 @@ void main() async {
   Hive.registerAdapter(SaveSurveyPojoAdapter());
   Hive.registerAdapter(SurveySubmitJsonDataAdapter());
   Hive.registerAdapter(ImageNamesAdapter());
+  Hive.registerAdapter(OfflineSurveyPojoAdapter());
+  Hive.registerAdapter(SurveySubmitMetaDataAdapter());
+  Hive.registerAdapter(SurveySubmitResponseDataAdapter());
 
   configLoading();
   SystemChrome.setSystemUIOverlayStyle(
@@ -57,6 +64,7 @@ void main() async {
     ),
   );
   runApp(const MyApp());
+  DependencyInjection.init();
 }
 
 class MyApp extends StatelessWidget {
@@ -103,7 +111,6 @@ void configLoading() {
 
 Future<String> fetchColorCodeFromBackend() async {
   // Simulated backend fetching delay
-  await Future.delayed(Duration(seconds: 2));
+  await Future.delayed(const Duration(seconds: 2));
   return '04437d'; // Example color code in hexadecimal format
 }
-

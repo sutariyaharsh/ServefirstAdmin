@@ -1,13 +1,13 @@
 import 'dart:convert';
+import 'dart:developer';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:servefirst_admin/constnts/constants.dart';
+import 'package:servefirst_admin/controller/network_controller.dart';
 import 'package:servefirst_admin/model/local_response/save_survey_pojo.dart';
 import 'package:servefirst_admin/model/request/response_list_request.dart';
-import 'package:servefirst_admin/model/response/location_survey/location_survey_data.dart';
 import 'package:servefirst_admin/model/response/location_survey/survey.dart';
 import 'package:servefirst_admin/model/response/response_list/response_list.dart';
 import 'package:servefirst_admin/model/response/response_list/responses_data.dart';
@@ -19,18 +19,13 @@ import 'package:servefirst_admin/service/remote_service/remote_get_response_list
 
 class SurveyResponsesController extends GetxController {
   static SurveyResponsesController instance = Get.find();
-  RxList<ResponsesData> responsesDataList =
-      List<ResponsesData>.empty(growable: true).obs;
-  RxList<SaveSurveyPojo> savedResponsesList =
-      List<SaveSurveyPojo>.empty(growable: true).obs;
+  RxList<ResponsesData> responsesDataList = List<ResponsesData>.empty(growable: true).obs;
+  RxList<SaveSurveyPojo> savedResponsesList = List<SaveSurveyPojo>.empty(growable: true).obs;
   RxInt page = RxInt(1);
-  final LocalGetLocationSurveysService _localGetLocationSurveysService =
-      LocalGetLocationSurveysService();
+  final LocalGetLocationSurveysService _localGetLocationSurveysService = LocalGetLocationSurveysService();
   final LocalLoginService _localLoginService = LocalLoginService();
-  final LocalSaveSurveyService _localSaveSurveyService =
-      LocalSaveSurveyService();
-  final LocalGetResponseListService _localGetResponseListService =
-      LocalGetResponseListService();
+  final LocalSaveSurveyService _localSaveSurveyService = LocalSaveSurveyService();
+  final LocalGetResponseListService _localGetResponseListService = LocalGetResponseListService();
 
   @override
   void onInit() async {
@@ -45,8 +40,7 @@ class SurveyResponsesController extends GetxController {
   }
 
   Future<Survey?> getSurveyFromSurveyId(String surveyId, String locationId) async {
-    return await _localGetLocationSurveysService.getSurveyFromSurveyId(
-        locationId: locationId, surveyId: surveyId);
+    return await _localGetLocationSurveysService.getSurveyFromSurveyId(locationId: locationId, surveyId: surveyId);
   }
 
   Future<void> getSavedSurvey() async {
@@ -56,44 +50,40 @@ class SurveyResponsesController extends GetxController {
   }
 
   Future<void> getResponseList(int page) async {
-    try {
-      EasyLoading.show(
-        dismissOnTap: false,
-      );
-      if (_localGetResponseListService.getResponseData()!.isNotEmpty) {
-        responsesDataList
-            .assignAll(_localGetResponseListService.getResponseData()!);
-      }
-      ResponseListRequest responseListRequest = ResponseListRequest(
-          userId: _localLoginService.getUser()!.sId ?? "", page: page);
-
-      if (kDebugMode) {
-        print(
-            '*getLocationSurveys, Request : ${jsonEncode(responseListRequest)}');
-      }
-      var result = await RemoteGetResponseListService().getResponseList(
-          responseListRequest: responseListRequest,
-          token: _localLoginService.getToken() ?? "");
-      if (result.statusCode == 200) {
-        ResponseList responseList =
-            ResponseList.fromJson(jsonDecode(result.body));
-        if (responseList.status == 200) {
-          responsesDataList.assignAll(responseDataListFromJson(result.body));
-          await _localGetResponseListService.assignAllResponsesData(
-              responsesData: responseDataListFromJson(result.body));
-          EasyLoading.dismiss();
-        } else {
-          EasyLoading.showError('Something wrong. Try again!');
+    if (NetworkController.isConnected) {
+      try {
+        EasyLoading.show(
+          dismissOnTap: false,
+        );
+        if (_localGetResponseListService.getResponseData()!.isNotEmpty) {
+          responsesDataList.assignAll(_localGetResponseListService.getResponseData()!);
         }
-      } else {
-        debugPrint("Result : ${result.statusCode} ** ${result.body}");
-        EasyLoading.showError('wrong. Try again!');
+        ResponseListRequest responseListRequest = ResponseListRequest(userId: _localLoginService.getUser()!.sId ?? "", page: page);
+        log("Request : ${jsonEncode(responseListRequest)}", name: "getResponseList");
+        var result = await RemoteGetResponseListService()
+            .getResponseList(responseListRequest: responseListRequest, token: _localLoginService.getToken() ?? "");
+        if (result.statusCode == 200) {
+          ResponseList responseList = ResponseList.fromJson(jsonDecode(result.body));
+          if (responseList.status == 200) {
+            responsesDataList.assignAll(responseDataListFromJson(result.body));
+            await _localGetResponseListService.assignAllResponsesData(responsesData: responseDataListFromJson(result.body));
+            EasyLoading.dismiss();
+          } else {
+            EasyLoading.showError('Something wrong. Try again!');
+          }
+        } else {
+          log("Response : ${result.statusCode} ** ${jsonEncode(result.body)}", name: "getResponseList");
+          EasyLoading.showError('wrong. Try again!');
+        }
+      } catch (e) {
+        log("catch : ${e.toString()}", name: "getResponseList");
+        EasyLoading.showError('Something wrong. Try again!');
+      } finally {
+        EasyLoading.dismiss();
       }
-    } catch (e) {
-      debugPrint(e.toString());
-      EasyLoading.showError('Something wrong. Try again!');
-    } finally {
-      EasyLoading.dismiss();
+    } else {
+      log('You\'re not connected to a network', name: "Network");
+      showNetworkErrorSnackBar();
     }
   }
 }

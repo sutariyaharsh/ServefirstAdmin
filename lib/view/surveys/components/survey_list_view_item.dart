@@ -5,8 +5,7 @@ import 'package:servefirst_admin/model/response/location_survey/survey.dart';
 import 'package:servefirst_admin/theme/app_theme.dart';
 
 class SurveyListViewItem extends StatelessWidget {
-  const SurveyListViewItem({super.key,
-  required this.survey});
+  const SurveyListViewItem({super.key, required this.survey});
 
   final Survey survey;
 
@@ -25,10 +24,7 @@ class SurveyListViewItem extends StatelessWidget {
           Expanded(
             child: Text(
               survey.name ?? "",
-              style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 16.sp),
+              style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400, fontSize: 16.sp),
             ),
           ),
           Image.asset(

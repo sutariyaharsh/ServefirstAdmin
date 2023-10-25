@@ -26,14 +26,10 @@ class SurveysScreen extends StatelessWidget {
                   },
                   child: Row(
                     children: [
-                      Icon(Icons.arrow_back_ios,
-                          color: AppTheme.lightGrayTextColor),
+                      Icon(Icons.arrow_back_ios, color: AppTheme.lightGrayTextColor),
                       Text(
                         "Dashboard",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16.sp,
-                            color: AppTheme.lightGrayTextColor),
+                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.sp, color: AppTheme.lightGrayTextColor),
                       ),
                     ],
                   ),
@@ -50,9 +46,7 @@ class SurveysScreen extends StatelessWidget {
                     itemBuilder: (BuildContext context, int index) {
                       return GestureDetector(
                           onTap: () {
-                            Get.to(() => SurveyScreen(
-                                survey: controller.surveyList[index],
-                                locationId: controller.locationId.value));
+                            Get.to(() => SurveyScreen(survey: controller.surveyList[index], locationId: controller.locationId.value));
                             /*Navigator.of(context).push(
                                     MaterialPageRoute(builder: (context) =>
                                         SurveyScreen2(survey: surveysController
@@ -61,8 +55,7 @@ class SurveysScreen extends StatelessWidget {
                                                 .locationId.value)));*/
                             //Get.toNamed(AppRoute.survey, arguments: argumentsMap)!.then((value) {});
                           },
-                          child: SurveyListViewItem(
-                              survey: controller.surveyList[index]));
+                          child: SurveyListViewItem(survey: controller.surveyList[index]));
                     },
                   ),
                 ),

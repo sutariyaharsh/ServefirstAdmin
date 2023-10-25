@@ -7,12 +7,10 @@ class LocalGetLocationSurveysService {
   late Box<LocationSurveyData> _LocationSurveyDataBox;
 
   Future<void> init() async {
-    _LocationSurveyDataBox =
-        await Hive.openBox<LocationSurveyData>('locationSurveyData');
+    _LocationSurveyDataBox = await Hive.openBox<LocationSurveyData>('locationSurveyData');
   }
 
-  Future<void> addLocationSurveyData(
-      {required LocationSurveyData locationSurveyData}) async {
+  Future<void> addLocationSurveyData({required LocationSurveyData locationSurveyData}) async {
     await _LocationSurveyDataBox.put('locationSurveyData', locationSurveyData);
   }
 
@@ -20,11 +18,9 @@ class LocalGetLocationSurveysService {
     await _LocationSurveyDataBox.clear();
   }
 
-  LocationSurveyData? getLocationSurveyData() =>
-      _LocationSurveyDataBox.get('locationSurveyData');
+  LocationSurveyData? getLocationSurveyData() => _LocationSurveyDataBox.get('locationSurveyData');
 
-  Future<Survey?> getSurveyFromSurveyId(
-      {required String locationId, required String surveyId}) async {
+  Future<Survey?> getSurveyFromSurveyId({required String locationId, required String surveyId}) async {
     List<Location> locationList = getLocationSurveyData()!.location ?? [];
     if (locationList.isNotEmpty) {
       for (var location in locationList) {

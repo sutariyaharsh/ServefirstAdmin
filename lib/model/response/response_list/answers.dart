@@ -1,4 +1,3 @@
-
 import 'package:hive/hive.dart';
 
 part 'answers.g.dart';
@@ -30,16 +29,16 @@ class Answers {
 
   Answers(
       {String? questionId,
-        String? questionText,
-        String? questionType,
-        int? queMaxScore,
-        bool? isNps,
-        int? ansMaxScore,
-        bool? is_Nps,
-        List<String>? files,
-        dynamic answer,
-        String? comment,
-        String? writeIn}) {
+      String? questionText,
+      String? questionType,
+      int? queMaxScore,
+      bool? isNps,
+      int? ansMaxScore,
+      bool? is_Nps,
+      List<String>? files,
+      dynamic answer,
+      String? comment,
+      String? writeIn}) {
     if (questionId != null) {
       this._questionId = questionId;
     }
@@ -76,26 +75,47 @@ class Answers {
   }
 
   String? get questionId => _questionId;
+
   set questionId(String? questionId) => _questionId = questionId;
+
   String? get questionText => _questionText;
+
   set questionText(String? questionText) => _questionText = questionText;
+
   String? get questionType => _questionType;
+
   set questionType(String? questionType) => _questionType = questionType;
+
   int? get queMaxScore => _queMaxScore;
+
   set queMaxScore(int? queMaxScore) => _queMaxScore = queMaxScore;
+
   bool? get isNps => _isNps;
+
   set isNps(bool? isNps) => _isNps = isNps;
+
   int? get ansMaxScore => _ansMaxScore;
+
   set ansMaxScore(int? ansMaxScore) => _ansMaxScore = ansMaxScore;
+
   bool? get is_Nps => _is_Nps;
+
   set is_Nps(bool? is_Nps) => _is_Nps = is_Nps;
+
   List<String>? get files => _files;
+
   set files(List<String>? files) => _files = files;
+
   dynamic? get answer => _answer;
+
   set answer(dynamic? answer) => _answer = answer;
+
   String? get comment => _comment;
+
   set comment(String? comment) => _comment = comment;
+
   String? get writeIn => _writeIn;
+
   set writeIn(String? writeIn) => _writeIn = writeIn;
 
   Answers.fromJson(Map<String, dynamic> json) {

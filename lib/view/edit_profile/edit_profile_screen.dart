@@ -6,9 +6,9 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:servefirst_admin/component/my_button.dart';
 import 'package:servefirst_admin/component/profile_text_field.dart';
-import 'package:servefirst_admin/constnts/image_strings.dart';
 import 'package:servefirst_admin/extention/string_extention.dart';
 import 'package:servefirst_admin/theme/app_theme.dart';
+import 'package:servefirst_admin/view/dashboard/dashboard_screen.dart';
 import 'package:servefirst_admin/view/edit_profile/controller/edit_profile_controller.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -46,18 +46,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 15.w),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.pop(context, true);
+                    Get.offAll(() => const DashboardScreen());
                   },
                   child: Row(
                     children: [
-                      Icon(Icons.arrow_back_ios,
-                          color: AppTheme.lightGrayTextColor),
+                      Icon(Icons.arrow_back_ios, color: AppTheme.lightGrayTextColor),
                       Text(
                         "Edit Profile",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16.sp,
-                            color: AppTheme.lightGrayTextColor),
+                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.sp, color: AppTheme.lightGrayTextColor),
                       ),
                     ],
                   ),
@@ -85,8 +81,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       width: 1.w,
                                     ),
                                     image: DecorationImage(
-                                      image: FileImage(
-                                          controller.imageFile.value!),
+                                      image: FileImage(controller.imageFile.value!),
                                       fit: BoxFit.fill,
                                     ),
                                   ),
@@ -105,19 +100,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   ),
                                   child: ClipOval(
                                     child: CachedNetworkImage(
-                                      imageUrl:
-                                          controller.loginUser.value?.image ??
-                                              "",
+                                      imageUrl: controller.loginUser.value?.image ?? "",
                                       fit: BoxFit.cover,
                                       placeholder: (context, url) => Container(
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 20),
+                                        margin: const EdgeInsets.symmetric(horizontal: 20),
                                         color: Colors.grey.shade300,
                                       ),
                                       errorWidget: (context, url, error) =>
-                                          Center(
-                                              child:
-                                                  Image.asset(placeHolderUser)),
+                                          Center(child: Image.network("https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png")),
                                     ),
                                   ),
                                 ),
@@ -187,8 +177,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               controller.editUserProfile(
                                   name_: controller.nameController.value.text,
                                   email_: controller.emailController.value.text,
-                                  phone_:
-                                      controller.phoneController.value.text);
+                                  phone_: controller.phoneController.value.text);
                             }
                           },
                           buttonText: "Save"),

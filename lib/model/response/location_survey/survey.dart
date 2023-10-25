@@ -2,6 +2,7 @@ import 'package:hive/hive.dart';
 import 'package:servefirst_admin/model/response/location_survey/question.dart';
 
 part 'survey.g.dart';
+
 @HiveType(typeId: 7)
 class Survey {
   @HiveField(0)
@@ -148,8 +149,7 @@ class Survey {
 
   int? get questionsPerPage => _questionsPerPage;
 
-  set questionsPerPage(int? questionsPerPage) =>
-      _questionsPerPage = questionsPerPage;
+  set questionsPerPage(int? questionsPerPage) => _questionsPerPage = questionsPerPage;
 
   String? get companyId => _companyId;
 
@@ -209,13 +209,11 @@ class Survey {
 
   String? get leadershipUserId => _leadershipUserId;
 
-  set leadershipUserId(String? leadershipUserId) =>
-      _leadershipUserId = leadershipUserId;
+  set leadershipUserId(String? leadershipUserId) => _leadershipUserId = leadershipUserId;
 
   String? get responseNotificationMails => _responseNotificationMails;
 
-  set responseNotificationMails(String? responseNotificationMails) =>
-      _responseNotificationMails = responseNotificationMails;
+  set responseNotificationMails(String? responseNotificationMails) => _responseNotificationMails = responseNotificationMails;
 
   int? get idealDuration => _idealDuration;
 

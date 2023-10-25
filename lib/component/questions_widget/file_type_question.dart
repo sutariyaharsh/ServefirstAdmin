@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -15,14 +13,12 @@ class FileTypeQuestion extends StatefulWidget {
       required this.question,
       required this.index,
       required this.surveyType,
-      required this.isMultiSelectRequired,
       required this.onCommentTextEntered})
       : super(key: key);
 
   final Questions question;
   final int index;
   final Function(String) onCommentTextEntered;
-  final Function(bool) isMultiSelectRequired;
   final String surveyType;
 
   @override
@@ -49,7 +45,6 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
 
   @override
   void initState() {
-    widget.isMultiSelectRequired(widget.question.required ?? false);
     super.initState();
   }
 
@@ -66,25 +61,30 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
               children: [
                 Text(
                   "${widget.index + 1}.",
-                  style: TextStyle(
-                      fontSize: 16.sp,
-                      color: AppTheme.lightPrimaryColor,
-                      fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 16.sp, color: AppTheme.lightPrimaryColor, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(width: 5.h),
                 Expanded(
                   child: Text(
                     "${widget.question.text}",
-                    style: TextStyle(
-                        height: 1.3,
-                        fontSize: 14.sp,
-                        color: AppTheme.lightPrimaryColor,
-                        fontWeight: FontWeight.w500),
+                    style: TextStyle(height: 1.3, fontSize: 14.sp, color: AppTheme.lightPrimaryColor, fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 15.h),
+            SizedBox(height: 5.h),
+            if (widget.question.required ?? false)
+              Obx(
+                () => controller.surveyJsonDataMap[widget.question.sId!]?.value == null
+                    ? Text("* Please select any option",
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          color: AppTheme.lightRed,
+                          fontWeight: FontWeight.w600,
+                        ))
+                    : Container(),
+              ),
+            SizedBox(height: 10.h),
             Column(
               children: [
                 GestureDetector(
@@ -96,10 +96,7 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
                     children: [
                       Text(
                         "Upload File",
-                        style: TextStyle(
-                            color: AppTheme.lightPrimaryColor,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600),
+                        style: TextStyle(color: AppTheme.lightPrimaryColor, fontSize: 14.sp, fontWeight: FontWeight.w600),
                       ),
                       Icon(
                         Icons.add,
@@ -112,14 +109,11 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
                 SizedBox(height: 10.h),
                 Obx(
                   () => ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                    itemCount: controller
-                            .imageFileListMap[widget.question.sId]?.length ??
-                        0,
+                    itemCount: controller.imageFileListMap[widget.question.sId]?.length ?? 0,
                     itemBuilder: (context, index) {
-                      final pickedImage = File(controller
-                          .imageFileListMap[widget.question.sId]![index]);
+                      final pickedImage = /*File(*/ controller.imageFileListMap[widget.question.sId]![index] /*)*/;
                       return Container(
                         margin: EdgeInsets.symmetric(vertical: 5.h),
                         padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -127,8 +121,7 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
                             borderRadius: BorderRadius.all(
                               Radius.circular(5.r),
                             ),
-                            border: Border.all(
-                                width: 1.w, color: AppTheme.lightGray)),
+                            border: Border.all(width: 1.w, color: AppTheme.lightGray)),
                         child: ListTile(
                           leading: Container(
                             width: 55.w,
@@ -138,23 +131,20 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
                                 Radius.circular(5.r),
                               ),
                               image: DecorationImage(
-                                image: FileImage(pickedImage),
+                                image: MemoryImage(pickedImage),
                                 fit: BoxFit.cover,
                               ),
                             ),
                           ),
                           title: Text(
-                            pickedImage.path.split(Platform.pathSeparator).last,
+                            /*pickedImage.path.split(Platform.pathSeparator).last*/
+                            "Image name",
                             maxLines: 1,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12.sp,
-                                color: AppTheme.lightGrayTextColor),
+                            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12.sp, color: AppTheme.lightGrayTextColor),
                           ),
                           // Replace with the actual image name
                           trailing: GestureDetector(
-                            onTap: () => controller.removeImageToFileMap(
-                                widget.question.sId!, index),
+                            onTap: () => controller.removeImageToFileMap(widget.question.sId!, index, widget.question.required ?? false),
                             child: Icon(
                               Icons.delete,
                               color: AppTheme.lightRed,
@@ -181,10 +171,7 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
                         children: [
                           Text(
                             "Add Comments",
-                            style: TextStyle(
-                                color: AppTheme.lightPrimaryColor,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w600),
+                            style: TextStyle(color: AppTheme.lightPrimaryColor, fontSize: 14.sp, fontWeight: FontWeight.w600),
                           ),
                           Icon(
                             Icons.add,
@@ -202,8 +189,7 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
                           borderRadius: BorderRadius.all(
                             Radius.circular(6.r),
                           ),
-                          border: Border.all(
-                              width: 1.w, color: AppTheme.lightGray)),
+                          border: Border.all(width: 1.w, color: AppTheme.lightGray)),
                       child: Column(
                         children: [
                           Column(
@@ -215,19 +201,13 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
                                   controller: _commentController,
                                   textDirection: TextDirection.ltr,
                                   cursorColor: AppTheme.lightPrimaryColor,
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 13.sp,
-                                      fontWeight: FontWeight.w500),
+                                  style: TextStyle(color: Colors.black, fontSize: 13.sp, fontWeight: FontWeight.w500),
                                   minLines: 1,
                                   // Set this to control the minimum number of lines to display
                                   maxLines: null,
                                   decoration: InputDecoration(
                                       hintText: "Enter Comment",
-                                      hintStyle: TextStyle(
-                                          color: AppTheme.lightDarkGray,
-                                          fontSize: 13.sp,
-                                          fontWeight: FontWeight.w500),
+                                      hintStyle: TextStyle(color: AppTheme.lightDarkGray, fontSize: 13.sp, fontWeight: FontWeight.w500),
                                       border: InputBorder.none),
                                 ),
                               ),
@@ -235,16 +215,13 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
                                 color: AppTheme.lightPrimaryColor,
                                 onPressed: () {
                                   if (_commentController.text.trim().isEmpty) {
-                                    showSnackBar(
-                                        message:
-                                            "Comment should not be empty!");
+                                    showSnackBar(message: "Comment should not be empty!");
                                   } else {
-                                    widget.onCommentTextEntered(
-                                        _commentController.text);
+                                    widget.onCommentTextEntered(_commentController.text);
                                     _showCommentText();
                                   }
                                 },
-                                icon: Icon(Icons.send),
+                                icon: const Icon(Icons.send),
                               ),
                             ],
                           )
@@ -259,8 +236,7 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
                           borderRadius: BorderRadius.all(
                             Radius.circular(6.r),
                           ),
-                          border: Border.all(
-                              width: 1.w, color: AppTheme.lightGray)),
+                          border: Border.all(width: 1.w, color: AppTheme.lightGray)),
                       child: Row(
                         children: [
                           Expanded(
@@ -268,10 +244,7 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
                               padding: EdgeInsets.symmetric(horizontal: 10.w),
                               child: Text(
                                 _commentController.text,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 12.sp,
-                                    color: Colors.black),
+                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12.sp, color: Colors.black),
                               ),
                             ),
                           ),
@@ -285,9 +258,7 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
                                 _isShowCommentInput = false;
                               });
                             },
-                            icon: Icon(Icons.cancel,
-                                color: AppTheme.lightPrimaryColor
-                                    .withOpacity(0.8)),
+                            icon: Icon(Icons.cancel, color: AppTheme.lightPrimaryColor.withOpacity(0.8)),
                           ),
                         ],
                       ),
@@ -295,18 +266,14 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
                   SizedBox(height: 10.h),
                   GestureDetector(
                     onTap: () {
-                      _showOptionsDialog(
-                          context, widget.question.questionType!, controller);
+                      _showOptionsDialog(context, widget.question.questionType!, controller);
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           "Upload Image",
-                          style: TextStyle(
-                              color: AppTheme.lightPrimaryColor,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600),
+                          style: TextStyle(color: AppTheme.lightPrimaryColor, fontSize: 14.sp, fontWeight: FontWeight.w600),
                         ),
                         Icon(
                           Icons.add,
@@ -321,14 +288,10 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
                     () => ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: controller
-                              .imageFileAuditionListMap[widget.question.sId]
-                              ?.length ??
-                          0,
+                      itemCount: controller.imageFileAuditionListMap[widget.question.sId]?.length ?? 0,
                       itemBuilder: (context, index) {
                         final pickedImage = /*File(*/
-                            controller.imageFileAuditionListMap[
-                                widget.question.sId]![index]/*)*/;
+                            controller.imageFileAuditionListMap[widget.question.sId]![index] /*)*/;
                         return Container(
                           margin: EdgeInsets.symmetric(vertical: 5.h),
                           padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -336,8 +299,7 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
                               borderRadius: BorderRadius.all(
                                 Radius.circular(5.r),
                               ),
-                              border: Border.all(
-                                  width: 1.w, color: AppTheme.lightGray)),
+                              border: Border.all(width: 1.w, color: AppTheme.lightGray)),
                           child: ListTile(
                             leading: Container(
                               width: 55.w,
@@ -355,17 +317,14 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
                             title: Text(
                               /*pickedImage.path
                                   .split(Platform.pathSeparator)
-                                  .last*/"Image Name",
+                                  .last*/
+                              "Image Name",
                               maxLines: 1,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12.sp,
-                                  color: AppTheme.lightGrayTextColor),
+                              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12.sp, color: AppTheme.lightGrayTextColor),
                             ),
                             // Replace with the actual image name
                             trailing: GestureDetector(
-                              onTap: () => controller.removeImageToAuditionMap(
-                                  widget.question.sId!, index),
+                              onTap: () => controller.removeImageToAuditionMap(widget.question.sId!, index),
                               child: Icon(
                                 Icons.delete,
                                 color: AppTheme.lightRed,
@@ -395,12 +354,10 @@ class _FileTypeQuestionState extends State<FileTypeQuestion> {
             children: <Widget>[
               _buildOptionButton('Camera', () {
                 Navigator.of(context).pop();
-                controller.pickImage(
-                    ImageSource.camera, fileType, widget.question.sId!);
+                controller.pickImage(ImageSource.camera, fileType, widget.question.sId!);
               }),
               _buildOptionButton('Gallery', () {
-                controller.pickImage(
-                    ImageSource.gallery, fileType, widget.question.sId!);
+                controller.pickImage(ImageSource.gallery, fileType, widget.question.sId!);
               }),
               _buildOptionButton('Cancel', () {
                 // Handle Cancel option

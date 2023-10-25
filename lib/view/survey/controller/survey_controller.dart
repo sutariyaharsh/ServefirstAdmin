@@ -2,8 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -11,31 +10,36 @@ import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:servefirst_admin/constnts/constants.dart';
+import 'package:servefirst_admin/controller/network_controller.dart';
+import 'package:servefirst_admin/model/local_response/offline_survey_pojo.dart';
 import 'package:servefirst_admin/model/local_response/save_survey_pojo.dart';
 import 'package:servefirst_admin/model/request/survey_submit/image_names.dart';
 import 'package:servefirst_admin/model/request/survey_submit/survey_submit_json_data.dart';
 import 'package:servefirst_admin/model/request/survey_submit/survey_submit_meta_data.dart';
 import 'package:servefirst_admin/model/request/survey_submit/survey_submit_response_data.dart';
 import 'package:servefirst_admin/model/response/location_survey/employee.dart';
+import 'package:servefirst_admin/model/response/location_survey/question.dart';
 import 'package:servefirst_admin/model/response/location_survey/survey.dart';
 import 'package:servefirst_admin/service/local_service/local_employee_service.dart';
 import 'package:servefirst_admin/service/local_service/local_get_location_surveys_service.dart';
 import 'package:servefirst_admin/service/local_service/local_login_service.dart';
+import 'package:servefirst_admin/service/local_service/local_offline_survey_service.dart';
 import 'package:servefirst_admin/service/local_service/local_save_survey_service.dart';
 import 'package:servefirst_admin/service/remote_service/remote_submit_survey_service.dart';
+import 'package:servefirst_admin/view/thank_you/thank_you_screen.dart';
 
 class SurveyController extends GetxController {
   static SurveyController instance = Get.find();
-  final LocalGetLocationSurveysService _localGetLocationSurveysService =
-      LocalGetLocationSurveysService();
-  final LocalSaveSurveyService _localSaveSurveyService =
-      LocalSaveSurveyService();
+  final LocalGetLocationSurveysService _localGetLocationSurveysService = LocalGetLocationSurveysService();
+  final LocalSaveSurveyService _localSaveSurveyService = LocalSaveSurveyService();
+  final LocalOfflineSurveyService _localOfflineSurveyService = LocalOfflineSurveyService();
   final LocalLoginService _localLoginService = LocalLoginService();
   final LocalEmployeeService _localEmployeeService = LocalEmployeeService();
   Rxn<Survey> survey = Rxn<Survey>();
   Rxn<SaveSurveyPojo> saveSurveyPojo = Rxn<SaveSurveyPojo>();
   RxList<Employee> employeeList = List<Employee>.empty(growable: true).obs;
+  RxList<String> requiredList = List<String>.empty(growable: true).obs;
+  RxList<Questions> listQuestion = List<Questions>.empty(growable: true).obs;
   RxString locationId = ''.obs;
   RxString helpDeskName = ''.obs;
   RxString helpDeskEmail = ''.obs;
@@ -43,53 +47,42 @@ class SurveyController extends GetxController {
   var questionIndex = 0.obs;
   var startIndex = 0.obs;
   var endIndex = 0.obs;
+  RxInt savedSurveyIndex = 0.obs;
+  RxBool isHelpDesk = false.obs;
+  final helpDeskNameController = TextEditingController();
+  final helpDeskEmailController = TextEditingController();
+  final helpDeskPhoneController = TextEditingController();
 
-  SurveyController(
-      {Survey? survey, String? locationId, SaveSurveyPojo? saveSurveyPojo}) {
+  SurveyController({Survey? survey, String? locationId, SaveSurveyPojo? saveSurveyPojo, int? savedSurveyIndex}) {
     this.survey.value = survey;
     this.locationId.value = locationId!;
     this.saveSurveyPojo.value = saveSurveyPojo;
-  }
-
-  RxMap<String, SurveySubmitJsonData> surveyJsonDataMap =
-      <String, SurveySubmitJsonData>{}.obs;
-  RxMap<String, SurveySubmitMetaData> surveyMetaDataMap =
-      <String, SurveySubmitMetaData>{}.obs;
-  RxMap<String, SurveySubmitResponseData> surveyResponseDataMap =
-      <String, SurveySubmitResponseData>{}.obs;
-  RxMap<String, List<Uint8List>> imageFileAuditionListMap =
-      <String, List<Uint8List>>{}.obs;
-  RxMap<String, List<String>> imageFileListMap =
-      <String, List<String>>{}.obs;
-
-  Future<void> saveSurvey() async {
-    try {
-      EasyLoading.show(
-        dismissOnTap: false,
-      );
-      SaveSurveyPojo saveSurveyPojo = SaveSurveyPojo();
-      saveSurveyPojo.surveyId = survey.value?.sId;
-      saveSurveyPojo.surveyName = survey.value?.name;
-      saveSurveyPojo.locationId = locationId.value;
-      saveSurveyPojo.createdAt = survey.value?.createdAt;
-      saveSurveyPojo.userId = _localLoginService.getUser()!.sId;
-      saveSurveyPojo.valueListMapSurveySubmit = surveyJsonDataMap;
-      saveSurveyPojo.valueListMapFilesType = imageFileListMap;
-      saveSurveyPojo.valueListMapFilesAudition = imageFileAuditionListMap;
-      _localSaveSurveyService.addSurvey(saveSurveyPojo: saveSurveyPojo);
-    } finally {
-      EasyLoading.dismiss();
+    this.savedSurveyIndex.value = savedSurveyIndex ?? -1;
+    isHelpDesk.value = survey!.helpDesk ?? false;
+    listQuestion.assignAll(survey.questions ?? []);
+    for (int i = 0; i < listQuestion.length; i++) {
+      if (this.saveSurveyPojo.value == null) {
+        if (listQuestion[i].required ?? false) {
+          requiredList.add(listQuestion[i].sId!);
+        }
+      } else {
+        if (!this.saveSurveyPojo.value!.valueListMapSurveySubmit!.containsKey(listQuestion[i].sId!)) {
+          if (listQuestion[i].required ?? false) {
+            requiredList.add(listQuestion[i].sId!);
+          }
+        }
+      }
     }
   }
 
+  RxMap<String, SurveySubmitJsonData> surveyJsonDataMap = <String, SurveySubmitJsonData>{}.obs;
+  RxMap<String, SurveySubmitMetaData> surveyMetaDataMap = <String, SurveySubmitMetaData>{}.obs;
+  RxMap<String, SurveySubmitResponseData> surveyResponseDataMap = <String, SurveySubmitResponseData>{}.obs;
+  RxMap<String, List<Uint8List>> imageFileAuditionListMap = <String, List<Uint8List>>{}.obs;
+  RxMap<String, List<Uint8List>> imageFileListMap = <String, List<Uint8List>>{}.obs;
+
   Future<void> addSurveyJsonData(
-      {required String key,
-      String? note,
-      String? writeIn,
-      String? type,
-      String? questionType,
-      Object? value,
-      bool? isFile}) async {
+      {required String key, String? note, String? writeIn, String? type, String? questionType, Object? value, bool? isFile}) async {
     if (!surveyJsonDataMap.containsKey(key)) {
       SurveySubmitJsonData surveySubmitJsonData = SurveySubmitJsonData();
       surveySubmitJsonData.note = note ?? '';
@@ -111,11 +104,10 @@ class SurveyController extends GetxController {
       if (isFile != null) surveyJsonDataMap[key]!.isFile = isFile;
     }
 
-    getLog(jsonEncode(surveyJsonDataMap));
+    log(jsonEncode(surveyJsonDataMap), name: "surveyJsonDataMap");
   }
 
-  Future<void> addImageToAuditionMap(
-      String key, String imagePath, String qType, Uint8List imgMemoryData) async {
+  Future<void> addImageToAuditionMap(String key, String imagePath, String qType, Uint8List imgMemoryData) async {
     if (!imageFileAuditionListMap.containsKey(key)) {
       imageFileAuditionListMap[key] = <Uint8List>[].obs;
     }
@@ -124,8 +116,7 @@ class SurveyController extends GetxController {
       if (surveyJsonDataMap[key]?.imageNamesList == null) {
         surveyJsonDataMap[key]?.imageNamesList = [];
       }
-      surveyJsonDataMap[key]?.imageNamesList?.add(
-          ImageNames(imageName: imagePath.split(Platform.pathSeparator).last));
+      surveyJsonDataMap[key]?.imageNamesList?.add(ImageNames(imageName: imagePath.split(Platform.pathSeparator).last));
       surveyJsonDataMap[key]?.isFile = true;
       surveyJsonDataMap[key]?.questionType = qType;
     } else {
@@ -133,26 +124,22 @@ class SurveyController extends GetxController {
       surveySubmitJsonData.isFile = true;
       surveySubmitJsonData.questionType = qType;
       surveySubmitJsonData.imageNamesList = [];
-      surveySubmitJsonData.imageNamesList!.add(
-          ImageNames(imageName: imagePath.split(Platform.pathSeparator).last));
+      surveySubmitJsonData.imageNamesList!.add(ImageNames(imageName: imagePath.split(Platform.pathSeparator).last));
       surveyJsonDataMap[key] = surveySubmitJsonData;
     }
 
     log(jsonEncode(surveyJsonDataMap), name: "surveyJsonDataMap");
   }
 
-  Future<void> addImageToFileMap(String key, String imagePath) async {
+  Future<void> addImageToFileMap(String key, String imagePath, Uint8List imgMemoryData) async {
     if (!imageFileListMap.containsKey(key)) {
-      imageFileListMap[key] = <String>[].obs;
+      imageFileListMap[key] = <Uint8List>[].obs;
     }
-    imageFileListMap[key]!.add(imagePath);
+    imageFileListMap[key]!.add(imgMemoryData);
     List<ImageNames> imageNamesList = [];
     if (surveyJsonDataMap.containsKey(key)) {
-      imageNamesList = (surveyJsonDataMap[key]?.value != null)
-          ? surveyJsonDataMap[key]?.value as List<ImageNames>
-          : [];
-      imageNamesList.add(
-          ImageNames(imageName: imagePath.split(Platform.pathSeparator).last));
+      imageNamesList = (surveyJsonDataMap[key]?.value != null) ? surveyJsonDataMap[key]?.value as List<ImageNames> : [];
+      imageNamesList.add(ImageNames(imageName: imagePath.split(Platform.pathSeparator).last));
       surveyJsonDataMap[key]?.value = imageNamesList;
       surveyJsonDataMap[key]?.isFile = true;
       surveyJsonDataMap[key]?.type = "file";
@@ -162,22 +149,24 @@ class SurveyController extends GetxController {
       surveySubmitJsonData.isFile = true;
       surveySubmitJsonData.type = "file";
       surveySubmitJsonData.questionType = "file";
-      imageNamesList.add(
-          ImageNames(imageName: imagePath.split(Platform.pathSeparator).last));
+      imageNamesList.add(ImageNames(imageName: imagePath.split(Platform.pathSeparator).last));
       surveySubmitJsonData.value = imageNamesList;
       surveyJsonDataMap[key] = surveySubmitJsonData;
     }
-
-    getLog('${jsonEncode(surveyJsonDataMap)}');
+    if (imageFileListMap[key]!.isNotEmpty) {
+      if (requiredList.contains(key)) {
+        requiredList.remove(key);
+        log("onRemove : ${jsonEncode(requiredList)}", name: "FileTypeQuestion");
+      }
+    }
+    log(jsonEncode(surveyJsonDataMap), name: "surveyJsonDataMap");
   }
 
   Future<void> removeImageToAuditionMap(String key, int index) async {
     imageFileAuditionListMap[key]?.removeAt(index);
     List<ImageNames> imageNamesList = [];
     if (surveyJsonDataMap.containsKey(key)) {
-      imageNamesList = (surveyJsonDataMap[key]?.value != null)
-          ? surveyJsonDataMap[key]?.value as List<ImageNames>
-          : [];
+      imageNamesList = (surveyJsonDataMap[key]?.value != null) ? surveyJsonDataMap[key]?.value as List<ImageNames> : [];
       if (surveyJsonDataMap[key]!.imageNamesList!.isNotEmpty) {
         surveyJsonDataMap[key]!.imageNamesList!.removeAt(index);
       }
@@ -189,16 +178,15 @@ class SurveyController extends GetxController {
         }
       }
     }
-    getLog('${jsonEncode(surveyJsonDataMap)}');
+
+    log(jsonEncode(surveyJsonDataMap), name: "surveyJsonDataMap");
   }
 
-  Future<void> removeImageToFileMap(String key, int index) async {
+  Future<void> removeImageToFileMap(String key, int index, bool isRequired) async {
     imageFileListMap[key]?.removeAt(index);
     List<ImageNames> imageNamesList = [];
     if (surveyJsonDataMap.containsKey(key)) {
-      imageNamesList = (surveyJsonDataMap[key]?.value != null)
-          ? surveyJsonDataMap[key]?.value as List<ImageNames>
-          : [];
+      imageNamesList = (surveyJsonDataMap[key]?.value != null) ? surveyJsonDataMap[key]?.value as List<ImageNames> : [];
       if (imageNamesList.isNotEmpty) {
         imageNamesList.removeAt(index);
       }
@@ -211,7 +199,13 @@ class SurveyController extends GetxController {
       }
       surveyJsonDataMap[key]?.value = imageNamesList;
     }
-    getLog('${jsonEncode(surveyJsonDataMap)}');
+    if (imageFileListMap[key]!.isEmpty) {
+      if (isRequired) {
+        requiredList.add(key);
+      }
+    }
+
+    log(jsonEncode(surveyJsonDataMap), name: "surveyJsonDataMap");
   }
 
   void addResponseData({String? name, String? email, String? phone}) {
@@ -221,28 +215,43 @@ class SurveyController extends GetxController {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    helpDeskNameController.dispose();
+    helpDeskEmailController.dispose();
+    helpDeskPhoneController.dispose();
+  }
+
+  @override
   void onInit() async {
     await _localLoginService.init();
     await _localGetLocationSurveysService.init();
     await _localEmployeeService.init();
     await _localSaveSurveyService.init();
+    await _localOfflineSurveyService.init();
 
-    if (locationId.isNotEmpty) {
+    if (locationId.value.isNotEmpty) {
       for (var employee in _localEmployeeService.getEmployees()) {
-        if (employee.locationId == locationId) {
+        if (employee.locationId == locationId.value) {
           employeeList.assignAll(_localEmployeeService.getEmployees());
         }
       }
     }
 
-    if(saveSurveyPojo.value != null){
-      getLog("surveyJsonDataMap : ${jsonEncode(saveSurveyPojo.value!.valueListMapSurveySubmit!)}");
+    if (saveSurveyPojo.value != null) {
+      log(jsonEncode(saveSurveyPojo.value!.valueListMapSurveySubmit!), name: "surveyJsonDataMap");
       surveyJsonDataMap.value = saveSurveyPojo.value!.valueListMapSurveySubmit!;
-      getLog("RatingTypeOnInit : ${jsonEncode(surveyJsonDataMap["643fdd3086e290d28f36cd2c"]?.value)}");
+      helpDeskName.value = saveSurveyPojo.value!.helpDeskName ?? "";
+      helpDeskEmail.value = saveSurveyPojo.value!.helpDeskEmail ?? "";
+      helpDeskPhone.value = saveSurveyPojo.value!.helpDeskPhone ?? "";
 
       imageFileAuditionListMap.value = saveSurveyPojo.value!.valueListMapFilesAudition!;
       imageFileListMap.value = saveSurveyPojo.value!.valueListMapFilesType!;
     }
+
+    helpDeskNameController.text = helpDeskName.value;
+    helpDeskEmailController.text = helpDeskEmail.value;
+    helpDeskPhoneController.text = helpDeskPhone.value;
 
     SurveySubmitMetaData submitMetaData = SurveySubmitMetaData();
     submitMetaData.locationId = locationId.value;
@@ -259,12 +268,55 @@ class SurveyController extends GetxController {
     super.onInit();
   }
 
+  Future<void> saveSurvey() async {
+    try {
+      EasyLoading.show(
+        dismissOnTap: false,
+      );
+      SaveSurveyPojo saveSurveyPojo = SaveSurveyPojo();
+      saveSurveyPojo.surveyId = survey.value?.sId;
+      saveSurveyPojo.surveyName = survey.value?.name;
+      saveSurveyPojo.locationId = locationId.value;
+      saveSurveyPojo.createdAt = survey.value?.createdAt;
+      saveSurveyPojo.userId = _localLoginService.getUser()!.sId;
+      saveSurveyPojo.helpDeskName = helpDeskName.value;
+      saveSurveyPojo.helpDeskEmail = helpDeskEmail.value;
+      saveSurveyPojo.helpDeskPhone = helpDeskPhone.value;
+      saveSurveyPojo.valueListMapSurveySubmit = surveyJsonDataMap;
+      saveSurveyPojo.valueListMapFilesType = imageFileListMap;
+      saveSurveyPojo.valueListMapFilesAudition = imageFileAuditionListMap;
+      _localSaveSurveyService.addSurvey(saveSurveyPojo: saveSurveyPojo);
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+
+  Future<void> saveOfflineSurvey() async {
+    try {
+      EasyLoading.show(
+        dismissOnTap: false,
+      );
+      if (savedSurveyIndex.value != -1) {
+        _localSaveSurveyService.removeSurvey(index: savedSurveyIndex.value);
+      }
+      OfflineSurveyPojo offlineSurveyPojo = OfflineSurveyPojo();
+      offlineSurveyPojo.jsonData = surveyJsonDataMap;
+      offlineSurveyPojo.metaData = surveyMetaDataMap;
+      offlineSurveyPojo.responseData = surveyResponseDataMap;
+      offlineSurveyPojo.valueListMapFilesType = imageFileListMap;
+      offlineSurveyPojo.valueListMapFilesAudition = imageFileAuditionListMap;
+      _localOfflineSurveyService.addOfflineSurvey(offlineSurveyPojo: offlineSurveyPojo);
+      Get.offAll(() => const ThankYouScreen());
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+
   Future<void> saveDataAndCallApi() async {
-    final connectivityResult = await Connectivity().checkConnectivity();
-    if (connectivityResult == ConnectivityResult.none) {
-      getLog('You\'re not connected to a network');
+    if (!NetworkController.isConnected) {
+      log('You\'re not connected to a network', name: "Network");
+      await saveOfflineSurvey();
     } else {
-      getLog('You\'re connected to a ${connectivityResult.name} network');
       try {
         EasyLoading.show(
           dismissOnTap: false,
@@ -277,42 +329,41 @@ class SurveyController extends GetxController {
 
           await Future.wait(uint8List.map((uint8ListImg) async {
             String? imageFilePath = await saveImageToTempDirectory(uint8ListImg);
-            var imagePart =
-                await http.MultipartFile.fromPath(key, imageFilePath ?? "");
+            var imagePart = await http.MultipartFile.fromPath(key, imageFilePath ?? "");
             multipartFilesList.add(imagePart);
           }));
         }));
 
         await Future.wait(imageFileListMap.entries.map((entry) async {
           final key = entry.key;
-          final fileList = entry.value;
+          final uint8List = entry.value;
 
-          await Future.wait(fileList.map((imageFilePath) async {
-            var imagePart =
-                await http.MultipartFile.fromPath(key, imageFilePath);
+          await Future.wait(uint8List.map((uint8ListImg) async {
+            String? imageFilePath = await saveImageToTempDirectory(uint8ListImg);
+            var imagePart = await http.MultipartFile.fromPath(key, imageFilePath ?? "");
             multipartFilesList.add(imagePart);
           }));
         }));
 
-        getLog('MultiPartFileList : ${multipartFilesList.length}');
+        log('MultiPartFileList : ${multipartFilesList.length}', name: "saveDataAndCallApi");
         var result = await RemoteSubmitSurveyService().submitSurvey(
             multipartFiles: multipartFilesList,
             surveySubmitJsonData: jsonEncode(surveyJsonDataMap),
-            surveySubmitMetaData:
-                jsonEncode(surveyMetaDataMap["SurveySubmitMetaData"]),
-            surveySubmitResponseData:
-                jsonEncode(surveyResponseDataMap["SurveySubmitResponseData"]),
+            surveySubmitMetaData: jsonEncode(surveyMetaDataMap["SurveySubmitMetaData"]),
+            surveySubmitResponseData: jsonEncode(surveyResponseDataMap["SurveySubmitResponseData"]),
             token: _localLoginService.getToken()!);
         if (result.statusCode == 200) {
           var responseBody = await result.stream.bytesToString();
+          if (savedSurveyIndex.value != -1) {
+            _localSaveSurveyService.removeSurvey(index: savedSurveyIndex.value);
+          }
           EasyLoading.showSuccess("Survey Submitted!");
+          Get.offAll(() => const ThankYouScreen());
         } else {
-          getLog(jsonDecode(await result.stream.bytesToString()));
-          EasyLoading.showError('Something wrong. Try again!');
+          log("Response :  ${jsonEncode(await result.stream.bytesToString())}", name: "submitSurvey");
         }
       } catch (e) {
-        debugPrint(e.toString());
-        EasyLoading.showError('Something wrong. Try again!');
+        log("catch : ${e.toString()}", name: "submitSurvey");
       } finally {
         EasyLoading.dismiss();
       }
@@ -328,7 +379,7 @@ class SurveyController extends GetxController {
       if (qType != "FileAnswer") {
         addImageToAuditionMap(qId, cropImgPath ?? "", qType, imageMemoryData ?? Uint8List(0));
       } else {
-        addImageToFileMap(qId, cropImgPath ?? "");
+        addImageToFileMap(qId, cropImgPath ?? "", imageMemoryData ?? Uint8List(0));
       }
       Get.back();
     } on PlatformException catch (e) {
@@ -338,8 +389,7 @@ class SurveyController extends GetxController {
   }
 
   Future<String?> _cropImage({required String imagePath}) async {
-    CroppedFile? croppedImage =
-    await ImageCropper().cropImage(sourcePath: imagePath);
+    CroppedFile? croppedImage = await ImageCropper().cropImage(sourcePath: imagePath);
     if (croppedImage == null) return null;
     log(croppedImage.path, name: "_cropImage");
     return croppedImage.path;

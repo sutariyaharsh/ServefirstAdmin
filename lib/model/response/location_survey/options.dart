@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 
 part 'options.g.dart';
+
 @HiveType(typeId: 9)
 class Options {
   @HiveField(0)
@@ -18,14 +19,7 @@ class Options {
   @HiveField(6)
   String? _sId;
 
-  Options(
-      {String? text,
-        int? value,
-        String? iconClass,
-        bool? writeIn,
-        bool? finishSurvey,
-        int? routeToIndex,
-        String? sId}) {
+  Options({String? text, int? value, String? iconClass, bool? writeIn, bool? finishSurvey, int? routeToIndex, String? sId}) {
     if (text != null) {
       this._text = text;
     }

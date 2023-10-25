@@ -14,6 +14,7 @@ class Tour {
   }
 
   String? get status => _status;
+
   set status(String? status) => _status = status;
 
   Tour.fromJson(Map<String, dynamic> json) {

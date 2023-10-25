@@ -22,12 +22,15 @@ class SaveSurveyPojoAdapter extends TypeAdapter<SaveSurveyPojo> {
       ..createdAt = fields[2] as String?
       ..locationId = fields[3] as String?
       ..userId = fields[4] as String?
+      ..helpDeskName = fields[5] as String?
+      ..helpDeskEmail = fields[6] as String?
+      ..helpDeskPhone = fields[7] as String?
       ..valueListMapSurveySubmit =
-          (fields[5] as Map?)?.cast<String, SurveySubmitJsonData>()
-      ..valueListMapFilesType = (fields[6] as Map?)?.map(
+          (fields[8] as Map?)?.cast<String, SurveySubmitJsonData>()
+      ..valueListMapFilesType = (fields[9] as Map?)?.map(
           (dynamic k, dynamic v) =>
-              MapEntry(k as String, (v as List).cast<String>()))
-      ..valueListMapFilesAudition = (fields[7] as Map?)?.map(
+              MapEntry(k as String, (v as List).cast<Uint8List>()))
+      ..valueListMapFilesAudition = (fields[10] as Map?)?.map(
           (dynamic k, dynamic v) =>
               MapEntry(k as String, (v as List).cast<Uint8List>()));
   }
@@ -35,7 +38,7 @@ class SaveSurveyPojoAdapter extends TypeAdapter<SaveSurveyPojo> {
   @override
   void write(BinaryWriter writer, SaveSurveyPojo obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.surveyId)
       ..writeByte(1)
@@ -47,10 +50,16 @@ class SaveSurveyPojoAdapter extends TypeAdapter<SaveSurveyPojo> {
       ..writeByte(4)
       ..write(obj.userId)
       ..writeByte(5)
-      ..write(obj.valueListMapSurveySubmit)
+      ..write(obj.helpDeskName)
       ..writeByte(6)
-      ..write(obj.valueListMapFilesType)
+      ..write(obj.helpDeskEmail)
       ..writeByte(7)
+      ..write(obj.helpDeskPhone)
+      ..writeByte(8)
+      ..write(obj.valueListMapSurveySubmit)
+      ..writeByte(9)
+      ..write(obj.valueListMapFilesType)
+      ..writeByte(10)
       ..write(obj.valueListMapFilesAudition);
   }
 

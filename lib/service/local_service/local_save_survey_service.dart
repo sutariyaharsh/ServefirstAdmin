@@ -14,8 +14,7 @@ class LocalSaveSurveyService {
 
   List<SaveSurveyPojo> getSavedSurveys() => _saveSurveyPojoBox.values.toList();
 
-  Future<void> updateSurvey(
-      {required int index, required SaveSurveyPojo updatedSurvey}) async {
+  Future<void> updateSurvey({required int index, required SaveSurveyPojo updatedSurvey}) async {
     if (index >= 0 && index < _saveSurveyPojoBox.length) {
       await _saveSurveyPojoBox.putAt(index, updatedSurvey);
     }
@@ -25,6 +24,10 @@ class LocalSaveSurveyService {
     if (index >= 0 && index < _saveSurveyPojoBox.length) {
       await _saveSurveyPojoBox.deleteAt(index);
     }
+  }
+
+  Future<void> removeSurveyObj({required SaveSurveyPojo saveSurveyPojo}) async {
+    await _saveSurveyPojoBox.delete(saveSurveyPojo);
   }
 
   Future<SaveSurveyPojo?> getSavedSurvey({required int index}) async {

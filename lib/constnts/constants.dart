@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -14,10 +16,7 @@ class PrefKeys {
   static const String END_DATE_FILTER = "END_DATE_FILTER";
   static const String SELECTED_DATE_FILTER = "SELECTED_DATE_FILTER";
   static const String FILTER_DATES = "SELECTED_DATES";
-}
-
-void getLog(String message) {
-  Get.log(isError: true, "** $message");
+  static const String LASTDATE_APICALL = "LASTDATE_APICALL";
 }
 
 String getTodayDaysDateRange() {
@@ -66,7 +65,7 @@ String getLastSevenDaysDateRange() {
 
 String getLastThirtyDaysDateRange() {
   final today = DateTime.now();
-  final startDate = today.subtract(Duration(days: 20));
+  final startDate = today.subtract(const Duration(days: 20));
   final endDate = today;
 
   final formatter = DateFormat('dd-MM-yyyy');
@@ -111,9 +110,8 @@ String getThisMonthDateRange() {
 String getLastMonthDateRange() {
   final today = DateTime.now();
   final firstDayOfCurrentMonth = DateTime(today.year, today.month, 1);
-  final firstDayOfLastMonth = DateTime(
-      firstDayOfCurrentMonth.year, firstDayOfCurrentMonth.month - 1, 1);
-  final lastDayOfLastMonth = firstDayOfCurrentMonth.subtract(Duration(days: 1));
+  final firstDayOfLastMonth = DateTime(firstDayOfCurrentMonth.year, firstDayOfCurrentMonth.month - 1, 1);
+  final lastDayOfLastMonth = firstDayOfCurrentMonth.subtract(const Duration(days: 1));
 
   final formatter = DateFormat('dd-MM-yyyy');
 
@@ -134,7 +132,7 @@ String getLastMonthDateRange() {
 
 String getLastNinetyDaysDateRange() {
   final today = DateTime.now();
-  final startDate = today.subtract(Duration(days: 90));
+  final startDate = today.subtract(const Duration(days: 90));
   final endDate = today;
 
   final formatter = DateFormat('dd-MM-yyyy');
@@ -185,20 +183,18 @@ Future<String> selectCustomDateRange(BuildContext context) async {
     firstDate: DateTime(DateTime.now().year - 1),
     lastDate: DateTime(DateTime.now().year + 1),
     initialDateRange: DateTimeRange(
-      start: DateTime.now().subtract(Duration(days: 7)),
+      start: DateTime.now().subtract(const Duration(days: 7)),
       end: DateTime.now(),
     ),
     builder: (BuildContext context, Widget? child) {
       return Theme(
         data: theme.copyWith(
           colorScheme: theme.colorScheme.copyWith(
-            primary: AppTheme
-                .lightPrimaryColor, // Customize the selection color here
+            primary: AppTheme.lightPrimaryColor, // Customize the selection color here
           ),
           buttonTheme: theme.buttonTheme.copyWith(
             colorScheme: theme.colorScheme.copyWith(
-              primary:
-                  AppTheme.lightPrimaryColor, // Customize the button color here
+              primary: AppTheme.lightPrimaryColor, // Customize the button color here
             ),
           ),
         ),
@@ -216,7 +212,7 @@ Future<String> selectCustomDateRange(BuildContext context) async {
     final formatter = DateFormat('dd-MM-yyyy');
     String formattedStartDate = formatter.format(startDate);
     String formattedEndDate = formatter.format(endDate);
-    print('Selected date range: $formattedStartDate to $formattedEndDate');
+    log('Selected date range: $formattedStartDate to $formattedEndDate', name: "selectCustomDateRange");
 
     final formatterApi = DateFormat('yyyy-MM-dd');
     final apiStartDate = formatterApi.format(startDate);
@@ -240,7 +236,7 @@ String formatDateString(String inputDate) {
   try {
     date = inputFormat.parse(inputDate);
   } catch (e) {
-    print(e);
+    log("catch : ${e.toString()}", name: "formatDateString");
     return ''; // Return null or any default value if parsing fails
   }
 
@@ -255,15 +251,33 @@ String formatDateString(String inputDate) {
 showSnackBar({required String message}) {
   Get.snackbar(
     "",
-    titleText: SizedBox.shrink(),
+    titleText: const SizedBox.shrink(),
     message,
     backgroundColor: AppTheme.lightPrimaryColor.withOpacity(0.6),
     messageText: Text(
       message,
-      style: TextStyle(
-          color: Colors.white,
-          fontSize: 12.sp,
-          fontWeight: FontWeight.w500), // Change the text color of the message.
+      style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w500), // Change the text color of the message.
     ),
   );
+}
+
+void showNetworkErrorSnackBar() {
+  Get.snackbar(
+    "",
+    titleText: const SizedBox.shrink(),
+    'You\'re not connected to a network, Please Check your internet connection!',
+    backgroundColor: AppTheme.lightRed.withOpacity(0.6), // Customize the background color
+    icon: const Icon(Icons.wifi_off, color: Colors.white), // Add an error icon
+    duration: const Duration(seconds: 5), // Set the position of the Snackbar
+    isDismissible: false,
+    messageText: Text(
+      'You\'re not connected to a network, Please Check your internet connection!',
+      style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.w500), // Change the text color of the message.
+    ),
+  );
+}
+
+void saveTodayDate() async {
+  String todayDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
+  SharedPreferencesHelper.saveString(PrefKeys.LASTDATE_APICALL, todayDate);
 }

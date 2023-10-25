@@ -1,5 +1,5 @@
-import 'package:servefirst_admin/model/response/login/tour.dart';
 import 'package:hive/hive.dart';
+import 'package:servefirst_admin/model/response/login/tour.dart';
 
 part 'user.g.dart';
 
@@ -50,26 +50,26 @@ class User {
 
   User(
       {Tour? tour,
-        String? sId,
-        String? name,
-        String? email,
-        String? phone,
-        String? password,
-        String? type,
-        String? companyId,
-        List<String>? locationId,
-        bool? isActive,
-        bool? allowEmail,
-        bool? isShow,
-        bool? allowComplainMails,
-        bool? includeInRatings,
-        String? image,
-        List<String>? locationName,
-        String? sfv1OldUserId,
-        String? userEmailSettings,
-        String? createdAt,
-        String? updatedAt,
-        int? iV}) {
+      String? sId,
+      String? name,
+      String? email,
+      String? phone,
+      String? password,
+      String? type,
+      String? companyId,
+      List<String>? locationId,
+      bool? isActive,
+      bool? allowEmail,
+      bool? isShow,
+      bool? allowComplainMails,
+      bool? includeInRatings,
+      String? image,
+      List<String>? locationName,
+      String? sfv1OldUserId,
+      String? userEmailSettings,
+      String? createdAt,
+      String? updatedAt,
+      int? iV}) {
     if (tour != null) {
       this._tour = tour;
     }
@@ -136,49 +136,87 @@ class User {
   }
 
   Tour? get tour => _tour;
+
   set tour(Tour? tour) => _tour = tour;
+
   String? get sId => _sId;
+
   set sId(String? sId) => _sId = sId;
+
   String? get name => _name;
+
   set name(String? name) => _name = name;
+
   String? get email => _email;
+
   set email(String? email) => _email = email;
+
   String? get phone => _phone;
+
   set phone(String? phone) => _phone = phone;
+
   String? get password => _password;
+
   set password(String? password) => _password = password;
+
   String? get type => _type;
+
   set type(String? type) => _type = type;
+
   String? get companyId => _companyId;
+
   set companyId(String? companyId) => _companyId = companyId;
+
   List<String>? get locationId => _locationId;
+
   set locationId(List<String>? locationId) => _locationId = locationId;
+
   bool? get isActive => _isActive;
+
   set isActive(bool? isActive) => _isActive = isActive;
+
   bool? get allowEmail => _allowEmail;
+
   set allowEmail(bool? allowEmail) => _allowEmail = allowEmail;
+
   bool? get isShow => _isShow;
+
   set isShow(bool? isShow) => _isShow = isShow;
+
   bool? get allowComplainMails => _allowComplainMails;
-  set allowComplainMails(bool? allowComplainMails) =>
-      _allowComplainMails = allowComplainMails;
+
+  set allowComplainMails(bool? allowComplainMails) => _allowComplainMails = allowComplainMails;
+
   bool? get includeInRatings => _includeInRatings;
-  set includeInRatings(bool? includeInRatings) =>
-      _includeInRatings = includeInRatings;
+
+  set includeInRatings(bool? includeInRatings) => _includeInRatings = includeInRatings;
+
   String? get image => _image;
+
   set image(String? image) => _image = image;
+
   List<String>? get locationName => _locationName;
+
   set locationName(List<String>? locationName) => _locationName = locationName;
+
   String? get sfv1OldUserId => _sfv1OldUserId;
+
   set sfv1OldUserId(String? sfv1OldUserId) => _sfv1OldUserId = sfv1OldUserId;
+
   String? get userEmailSettings => _userEmailSettings;
-  set userEmailSettings(String? userEmailSettings) =>
-      _userEmailSettings = userEmailSettings;
+
+  set userEmailSettings(String? userEmailSettings) => _userEmailSettings = userEmailSettings;
+
   String? get createdAt => _createdAt;
+
   set createdAt(String? createdAt) => _createdAt = createdAt;
+
   String? get updatedAt => _updatedAt;
+
   set updatedAt(String? updatedAt) => _updatedAt = updatedAt;
+
   int? get iV => _iV;
+
   set iV(int? iV) => _iV = iV;
 
   User.fromJson(Map<String, dynamic> json) {

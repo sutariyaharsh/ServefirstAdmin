@@ -11,6 +11,7 @@ class MyButton extends StatelessWidget {
     this.height,
     this.fontSize,
   });
+
   VoidCallback onTap;
   String buttonText;
   double? width;
@@ -42,11 +43,7 @@ class MyButton extends StatelessWidget {
             children: [
               Text(
                 buttonText,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: fontSize ?? 14.sp,
-                    fontFamily: 'Nexa',
-                    fontWeight: FontWeight.w700),
+                style: TextStyle(color: Colors.white, fontSize: fontSize ?? 14.sp, fontFamily: 'Nexa', fontWeight: FontWeight.w700),
               ),
             ],
           ),

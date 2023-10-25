@@ -45,8 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(height: 35.h),
                 Text(
                   sWelcome,
-                  style:
-                      TextStyle(fontWeight: FontWeight.w500, fontSize: 24.sp),
+                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 24.sp),
                 ),
                 SizedBox(height: 35.h),
                 Text(
@@ -100,9 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         padding: EdgeInsets.symmetric(horizontal: 25.w),
                         child: Text(
                           sForgotPassword,
-                          style: TextStyle(
-                              fontSize: 16.sp,
-                              color: AppTheme.lightPrimaryColor),
+                          style: TextStyle(fontSize: 16.sp, color: AppTheme.lightPrimaryColor),
                         ),
                       ),
                       SizedBox(
@@ -113,9 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: MyButton(
                             onTap: () {
                               if (_formKey.currentState!.validate()) {
-                                controller.login(
-                                    email: _emailController.text,
-                                    password: _passwordController.text);
+                                controller.login(email: _emailController.text, password: _passwordController.text);
                                 /*Navigator.push(context, MaterialPageRoute(builder: (context){
                               return DashboardScreen();
                             }));*/
@@ -128,21 +123,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 125.h),
                 Text.rich(
-                  TextSpan(
-                      text: sNotHaveAccount,
-                      style: TextStyle(
-                          fontFamily: 'Nexa',
-                          fontSize: 16.sp,
-                          color: Colors.grey),
-                      children: [
-                        TextSpan(
-                            text: sSignUp,
-                            style: TextStyle(
-                                fontFamily: 'Nexa',
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w500,
-                                color: AppTheme.lightPrimaryColor))
-                      ]),
+                  TextSpan(text: sNotHaveAccount, style: TextStyle(fontFamily: 'Nexa', fontSize: 16.sp, color: Colors.grey), children: [
+                    TextSpan(
+                        text: sSignUp,
+                        style: TextStyle(fontFamily: 'Nexa', fontSize: 16.sp, fontWeight: FontWeight.w500, color: AppTheme.lightPrimaryColor))
+                  ]),
                 ),
               ],
             ),

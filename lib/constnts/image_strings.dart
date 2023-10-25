@@ -19,4 +19,5 @@ const String emojiDisappointed = "assets/images/emoji_disappointed.gif";
 const String emojiNeutral = "assets/images/emoji_neutral.gif";
 const String emojiLike = "assets/images/emoji_like.gif";
 const String emojiLove = "assets/images/emoji_love.gif";
-const String bgThankYou = "assets/images/bg_thankyou_potrait.png";
+const String bgThankYouPortrait = "assets/images/bg_thankyou_potrait.png";
+const String bgThankYouLandscape = "assets/images/bg_thnankyou_landscap.png";

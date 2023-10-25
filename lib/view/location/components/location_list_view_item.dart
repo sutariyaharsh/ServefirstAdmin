@@ -4,8 +4,7 @@ import 'package:servefirst_admin/model/response/location_survey/location.dart';
 import 'package:servefirst_admin/theme/app_theme.dart';
 
 class LocationListViewItem extends StatelessWidget {
-  const LocationListViewItem({Key? key,
-  required this.location});
+  const LocationListViewItem({super.key, required this.location});
 
   final Location location;
 
@@ -25,19 +24,13 @@ class LocationListViewItem extends StatelessWidget {
                 Text(
                   location.name ?? "",
                   maxLines: 2,
-                  style: TextStyle(
-                      color: AppTheme.lightTextBlackColor,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16.sp),
+                  style: TextStyle(color: AppTheme.lightTextBlackColor, fontWeight: FontWeight.w500, fontSize: 16.sp),
                 ),
                 SizedBox(height: 5.h),
                 Text(
                   location.address1 ?? "",
                   maxLines: 1,
-                  style: TextStyle(
-                      color: AppTheme.lightTextColor,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 12.sp),
+                  style: TextStyle(color: AppTheme.lightTextColor, fontWeight: FontWeight.w400, fontSize: 12.sp),
                 ),
               ],
             ),

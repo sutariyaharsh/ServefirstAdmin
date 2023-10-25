@@ -25,14 +25,10 @@ class LocationScreen extends StatelessWidget {
                   },
                   child: Row(
                     children: [
-                      Icon(Icons.arrow_back_ios,
-                          color: AppTheme.lightGrayTextColor),
+                      Icon(Icons.arrow_back_ios, color: AppTheme.lightGrayTextColor),
                       Text(
                         "Dashboard",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16.sp,
-                            color: AppTheme.lightGrayTextColor),
+                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.sp, color: AppTheme.lightGrayTextColor),
                       ),
                     ],
                   ),
@@ -50,8 +46,7 @@ class LocationScreen extends StatelessWidget {
                           onTap: () {
                             Get.to(() => SurveysScreen(index: index));
                           },
-                          child: LocationListViewItem(
-                              location: controller.locationList[index]));
+                          child: LocationListViewItem(location: controller.locationList[index]));
                     },
                   ),
                 ),

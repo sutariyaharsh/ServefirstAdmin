@@ -3,9 +3,7 @@ import 'dart:convert';
 import 'package:servefirst_admin/model/response/response_list/responses_data.dart';
 
 List<ResponsesData> responseDataListFromJson(String val) =>
-    List<ResponsesData>.from(json.decode(val)['data']
-        .map((response) => ResponsesData.fromJson(response))
-    );
+    List<ResponsesData>.from(json.decode(val)['data'].map((response) => ResponsesData.fromJson(response)));
 
 class ResponseList {
   int? _status;
@@ -25,10 +23,15 @@ class ResponseList {
   }
 
   int? get status => _status;
+
   set status(int? status) => _status = status;
+
   String? get message => _message;
+
   set message(String? message) => _message = message;
+
   List<ResponsesData>? get data => _data;
+
   set data(List<ResponsesData>? data) => _data = data;
 
   ResponseList.fromJson(Map<String, dynamic> json) {

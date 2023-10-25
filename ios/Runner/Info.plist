@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>Enable location access to provide relevant nearby survey information.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Enable location access to provide relevant nearby survey information.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>Enable location access to provide relevant nearby survey information.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -36,14 +42,6 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
-
-	<key>NSLocationWhenInUseUsageDescription</key>
-    <string>Your explanation for why you need location access</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Your explanation for why you need location access</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>Your explanation for why you need location access</string>
-
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

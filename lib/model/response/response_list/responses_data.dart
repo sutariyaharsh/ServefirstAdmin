@@ -37,19 +37,19 @@ class ResponsesData {
 
   ResponsesData(
       {String? createdAt,
-        String? sId,
-        String? survey,
-        String? surveyId,
-        String? surveyDescription,
-        String? surveyType,
-        String? surveyCreatedAt,
-        int? surveyMaxScore,
-        List<Answers>? answers,
-        List<SurveyCategories>? surveyCategories,
-        int? npsScore,
-        int? questionScore,
-        int? answerScore,
-        num? resultPercent}) {
+      String? sId,
+      String? survey,
+      String? surveyId,
+      String? surveyDescription,
+      String? surveyType,
+      String? surveyCreatedAt,
+      int? surveyMaxScore,
+      List<Answers>? answers,
+      List<SurveyCategories>? surveyCategories,
+      int? npsScore,
+      int? questionScore,
+      int? answerScore,
+      num? resultPercent}) {
     if (createdAt != null) {
       this._createdAt = createdAt;
     }
@@ -95,35 +95,59 @@ class ResponsesData {
   }
 
   String? get createdAt => _createdAt;
+
   set createdAt(String? createdAt) => _createdAt = createdAt;
+
   String? get sId => _sId;
+
   set sId(String? sId) => _sId = sId;
+
   String? get survey => _survey;
+
   set survey(String? survey) => _survey = survey;
+
   String? get surveyId => _surveyId;
+
   set surveyId(String? surveyId) => _surveyId = surveyId;
+
   String? get surveyDescription => _surveyDescription;
-  set surveyDescription(String? surveyDescription) =>
-      _surveyDescription = surveyDescription;
+
+  set surveyDescription(String? surveyDescription) => _surveyDescription = surveyDescription;
+
   String? get surveyType => _surveyType;
+
   set surveyType(String? surveyType) => _surveyType = surveyType;
+
   String? get surveyCreatedAt => _surveyCreatedAt;
-  set surveyCreatedAt(String? surveyCreatedAt) =>
-      _surveyCreatedAt = surveyCreatedAt;
+
+  set surveyCreatedAt(String? surveyCreatedAt) => _surveyCreatedAt = surveyCreatedAt;
+
   int? get surveyMaxScore => _surveyMaxScore;
+
   set surveyMaxScore(int? surveyMaxScore) => _surveyMaxScore = surveyMaxScore;
+
   List<Answers>? get answers => _answers;
+
   set answers(List<Answers>? answers) => _answers = answers;
+
   List<SurveyCategories>? get surveyCategories => _surveyCategories;
-  set surveyCategories(List<SurveyCategories>? surveyCategories) =>
-      _surveyCategories = surveyCategories;
+
+  set surveyCategories(List<SurveyCategories>? surveyCategories) => _surveyCategories = surveyCategories;
+
   int? get npsScore => _npsScore;
+
   set npsScore(int? npsScore) => _npsScore = npsScore;
+
   int? get questionScore => _questionScore;
+
   set questionScore(int? questionScore) => _questionScore = questionScore;
+
   int? get answerScore => _answerScore;
+
   set answerScore(int? answerScore) => _answerScore = answerScore;
+
   num? get resultPercent => _resultPercent;
+
   set resultPercent(num? resultPercent) => _resultPercent = resultPercent;
 
   ResponsesData.fromJson(Map<String, dynamic> json) {
@@ -167,8 +191,7 @@ class ResponsesData {
       data['answers'] = this._answers!.map((v) => v.toJson()).toList();
     }
     if (this._surveyCategories != null) {
-      data['surveyCategories'] =
-          this._surveyCategories!.map((v) => v.toJson()).toList();
+      data['surveyCategories'] = this._surveyCategories!.map((v) => v.toJson()).toList();
     }
     data['npsScore'] = this._npsScore;
     data['questionScore'] = this._questionScore;

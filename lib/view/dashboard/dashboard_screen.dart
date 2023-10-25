@@ -14,23 +14,21 @@ class DashboardScreen extends StatelessWidget {
   const DashboardScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => OrientationBuilder(builder: (context, orientation){
     final controller = Get.put(DashboardController());
+    final isPortrait = orientation == Orientation.portrait;
+    final isMobile = MediaQuery.of(context).size.shortestSide < 600;
     return GetBuilder<DashboardController>(
         builder: (controller) => WillPopScope(
               onWillPop: () async {
-                await SystemChannels.platform
-                    .invokeMethod('SystemNavigator.pop');
+                await SystemChannels.platform.invokeMethod('SystemNavigator.pop');
                 return true;
               },
               child: Scaffold(
                 extendBody: true,
-                body: SafeArea(
-                  top: false,
-                  child: IndexedStack(
-                    index: controller.tabIndex,
-                    children: const [ReportScreen(), ProfileScreen()],
-                  ),
+                body: IndexedStack(
+                  index: controller.tabIndex,
+                  children: const [ReportScreen(), ProfileScreen()],
                 ),
                 bottomNavigationBar: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -49,35 +47,28 @@ class DashboardScreen extends StatelessWidget {
                           controller.updateIndex(val);
                         },
                         currentIndex: controller.tabIndex,
-                        unselectedFontSize: 12.sp,
-                        selectedFontSize: 12.sp,
+                        unselectedFontSize: isPortrait ? 12.sp : 6.sp,
+                        selectedFontSize: isPortrait ? 12.sp : 6.sp,
                         type: BottomNavigationBarType.fixed,
                         selectedItemColor: AppTheme.lightPrimaryColor,
                         unselectedItemColor: AppTheme.lightAccentColor,
                         elevation: 0,
                         items: [
                           BottomNavigationBarItem(
-                              icon: Container(
-                                  padding: EdgeInsets.only(bottom: 6.h),
-                                  child: SvgIcon(assetImage: icReport)),
-                              label: sReport),
+                              icon: Container(padding: EdgeInsets.only(bottom: 6.h), child: SvgIcon(assetImage: icReport)), label: sReport),
                           BottomNavigationBarItem(
-                              icon: Container(
-                                  padding: EdgeInsets.only(bottom: 6.h),
-                                  child: const Icon(
-                                      Icons.account_circle_outlined)),
+                              icon: Container(padding: EdgeInsets.only(bottom: 6.h), child: const Icon(Icons.account_circle_outlined)),
                               label: sProfile),
                         ],
                         selectedIconTheme: IconThemeData(
                           color: AppTheme.lightPrimaryColor,
                         ),
-                        unselectedIconTheme:
-                            IconThemeData(color: AppTheme.lightAccentColor),
+                        unselectedIconTheme: IconThemeData(color: AppTheme.lightAccentColor),
                       ),
                     ),
                   ],
                 ),
               ),
             ));
-  }
+  });
 }

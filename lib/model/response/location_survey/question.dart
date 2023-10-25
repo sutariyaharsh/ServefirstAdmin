@@ -2,6 +2,7 @@ import 'package:hive/hive.dart';
 import 'package:servefirst_admin/model/response/location_survey/options.dart';
 
 part 'question.g.dart';
+
 @HiveType(typeId: 8)
 class Questions {
   @HiveField(0)
@@ -31,17 +32,17 @@ class Questions {
 
   Questions(
       {String? text,
-        String? subText,
-        String? questionType,
-        String? categoryId,
-        String? journeyType,
-        int? maxScore,
-        bool? required,
-        int? minOptions,
-        int? maxOptions,
-        List<Options>? options,
-        bool? isNps,
-        String? sId}) {
+      String? subText,
+      String? questionType,
+      String? categoryId,
+      String? journeyType,
+      int? maxScore,
+      bool? required,
+      int? minOptions,
+      int? maxOptions,
+      List<Options>? options,
+      bool? isNps,
+      String? sId}) {
     if (text != null) {
       this._text = text;
     }

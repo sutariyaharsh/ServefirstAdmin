@@ -10,22 +10,21 @@ class ResponseDetailsController extends GetxController {
   static ResponseDetailsController instance = Get.find();
   final int index;
   Rxn<ResponsesData> responseData = Rxn<ResponsesData>();
-  RxList<Answers> answersList =
-      List<Answers>.empty(growable: true).obs;
-  RxList<SurveyCategories> categoriesList =
-      List<SurveyCategories>.empty(growable: true).obs;
+  RxList<Answers> answersList = List<Answers>.empty(growable: true).obs;
+  RxList<SurveyCategories> categoriesList = List<SurveyCategories>.empty(growable: true).obs;
 
   ResponseDetailsController(this.index);
+
   final LocalGetResponseListService _localGetResponseListService = LocalGetResponseListService();
 
   @override
   void onInit() async {
     await _localGetResponseListService.init();
-    getResponseDetail();
+    await getResponseDetail();
     super.onInit();
   }
 
-  void getResponseDetail() async {
+  Future<void> getResponseDetail() async {
     try {
       EasyLoading.show(
         dismissOnTap: false,
@@ -34,7 +33,7 @@ class ResponseDetailsController extends GetxController {
       answersList.assignAll(responseData.value!.answers!);
       categoriesList.assignAll(responseData.value!.surveyCategories!);
       EasyLoading.dismiss();
-    }catch (e) {
+    } catch (e) {
       debugPrint(e.toString());
       EasyLoading.showError('Something wrong. Try again!');
     } finally {

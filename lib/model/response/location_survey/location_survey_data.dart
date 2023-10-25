@@ -21,8 +21,11 @@ class LocationSurveyData {
   }
 
   List<Location>? get location => _location;
+
   set location(List<Location>? location) => _location = location;
+
   List<Survey>? get global => _global;
+
   set global(List<Survey>? global) => _global = global;
 
   LocationSurveyData.fromJson(Map<String, dynamic> json) {

@@ -37,12 +37,9 @@ class AppTheme {
       visualDensity: VisualDensity.adaptivePlatformDensity,
       appBarTheme: AppBarTheme(backgroundColor: lightPrimaryColor),
       colorScheme: ColorScheme.light(secondary: lightSecondaryColor),
-      textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(primary: lightBackgroundColor))
-  );
+      textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(primary: lightBackgroundColor)));
 
-  static Brightness get currentSystemBrightness =>
-      SchedulerBinding.instance!.window.platformBrightness;
+  static Brightness get currentSystemBrightness => SchedulerBinding.instance!.window.platformBrightness;
 
   static setStatusBarAndNavigationBarColors(ThemeMode themeMode) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(

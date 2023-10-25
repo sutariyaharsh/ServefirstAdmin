@@ -3,18 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:servefirst_admin/theme/app_theme.dart';
 
 class ProfileTextField extends StatelessWidget {
-   ProfileTextField({
-    super.key,
-    required this.myController,
-    required this.labelText,
-     this.validation,
-    this.textInputType
-  });
+  ProfileTextField({super.key, required this.myController, required this.labelText, this.validation, this.textInputType});
 
   final TextEditingController myController;
   final String labelText;
   TextInputType? textInputType;
-   final String? Function(String?)? validation;
+  final String? Function(String?)? validation;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +24,7 @@ class ProfileTextField extends StatelessWidget {
       child: TextFormField(
         controller: myController,
         validator: validation ??
-                (val) {
+            (val) {
               return null;
             },
         style: TextStyle(

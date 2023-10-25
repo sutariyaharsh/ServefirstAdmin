@@ -3,13 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:servefirst_admin/theme/app_theme.dart';
 
 class SurveyResponseListViewItem extends StatelessWidget {
-  const SurveyResponseListViewItem({
-    super.key,
-    required this.index,
-    required this.surveyName,
-    required this.surveyCreatedAt,
-    this.onDeleteClick
-  });
+  const SurveyResponseListViewItem({super.key, required this.index, required this.surveyName, required this.surveyCreatedAt, this.onDeleteClick});
 
   final int index;
   final String surveyName;
@@ -32,16 +26,10 @@ class SurveyResponseListViewItem extends StatelessWidget {
             width: 32.w,
             height: 32.h,
             alignment: Alignment.center,
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border:
-                    Border.all(width: 1.w, color: AppTheme.lightGrayTextColor)),
+            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(width: 1.w, color: AppTheme.lightGrayTextColor)),
             child: Text(
               "${index + 1}",
-              style: TextStyle(
-                  color: AppTheme.lightGrayTextColor,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 16.sp),
+              style: TextStyle(color: AppTheme.lightGrayTextColor, fontWeight: FontWeight.w400, fontSize: 16.sp),
             ),
           ),
           SizedBox(width: 15.w),
@@ -56,30 +44,25 @@ class SurveyResponseListViewItem extends StatelessWidget {
                     children: [
                       Text(
                         surveyName,
-                        style: TextStyle(
-                            color: AppTheme.lightPrimaryColor,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 18.sp),
+                        style: TextStyle(color: AppTheme.lightPrimaryColor, fontWeight: FontWeight.w600, fontSize: 18.sp),
                       ),
                       SizedBox(height: 8.h),
                       Text(
                         "Created at $surveyCreatedAt",
                         maxLines: 1,
-                        style: TextStyle(
-                            color: AppTheme.lightGrayTextColor,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12.sp),
+                        style: TextStyle(color: AppTheme.lightGrayTextColor, fontWeight: FontWeight.w500, fontSize: 12.sp),
                       ),
                     ],
                   ),
                 ),
-                if(onDeleteClick != null) GestureDetector(
-                  onTap: onDeleteClick,
-                  child: Icon(
-                    Icons.delete_outline,
-                    color: AppTheme.lightGrayTextColor,
-                  ),
-                )
+                if (onDeleteClick != null)
+                  GestureDetector(
+                    onTap: onDeleteClick,
+                    child: Icon(
+                      Icons.delete_outline,
+                      color: AppTheme.lightGrayTextColor,
+                    ),
+                  )
               ],
             ),
           ),

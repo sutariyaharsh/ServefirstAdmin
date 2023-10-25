@@ -17,8 +17,7 @@ class LocationService {
       );
     } else if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission != LocationPermission.whileInUse &&
-          permission != LocationPermission.always) {
+      if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
         // Handle the case where the user has denied location permission
         return Position(
           latitude: 0,

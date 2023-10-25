@@ -73,8 +73,7 @@ class Employee {
       if (response.statusCode == 200) {
         // Get the temporary directory for the app
         final appDir = await getTemporaryDirectory();
-        final imagePath =
-            "${appDir.path}/$id.png";
+        final imagePath = "${appDir.path}/$id.png";
 
         // Write the image data to the file
         final file = File(imagePath);

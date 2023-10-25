@@ -18,10 +18,15 @@ class Login {
   }
 
   int? get status => _status;
+
   set status(int? status) => _status = status;
+
   String? get message => _message;
+
   set message(String? message) => _message = message;
+
   LoginData? get data => _data;
+
   set data(LoginData? data) => _data = data;
 
   Login.fromJson(Map<String, dynamic> json) {

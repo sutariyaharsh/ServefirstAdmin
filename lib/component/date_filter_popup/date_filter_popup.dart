@@ -9,10 +9,12 @@ import 'package:servefirst_admin/view/report/controller/report_controller.dart';
 
 class DateFilterPopup extends StatefulWidget {
   final List<PopupMenuItem<int>> popupMenuItems;
+  final double titleFontSize;
+  final double dateFontSize;
 
   const DateFilterPopup({
     Key? key,
-    required this.popupMenuItems,
+    required this.popupMenuItems, required this.titleFontSize, required this.dateFontSize,
   }) : super(key: key);
 
   @override
@@ -38,10 +40,8 @@ class _DateFilterPopupState extends State<DateFilterPopup> {
   }
 
   void _showPopupMenu() {
-    final RenderBox? textRenderBox =
-        _textKey.currentContext?.findRenderObject() as RenderBox?;
-    final Offset textPosition =
-        textRenderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
+    final RenderBox? textRenderBox = _textKey.currentContext?.findRenderObject() as RenderBox?;
+    final Offset textPosition = textRenderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
     final Size textSize = textRenderBox?.size ?? Size.zero;
 
     _overlayEntry = OverlayEntry(
@@ -53,9 +53,7 @@ class _DateFilterPopupState extends State<DateFilterPopup> {
             width: textSize.width,
             child: Container(
               margin: EdgeInsets.only(top: 5.h),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5.r),
-                  color: Colors.white),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(5.r), color: Colors.white),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,10 +142,7 @@ class _DateFilterPopupState extends State<DateFilterPopup> {
                   Obx(
                     () => Text(
                       controller.filterTitle.value,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color: AppTheme.lightAccentColor,
-                          fontSize: 12.sp),
+                      style: TextStyle(fontWeight: FontWeight.w500, color: AppTheme.lightAccentColor, fontSize: widget.titleFontSize),
                     ),
                   ),
                   SizedBox(width: 5.w),
@@ -163,10 +158,7 @@ class _DateFilterPopupState extends State<DateFilterPopup> {
               Obx(
                 () => Text(
                   controller.filterDates.value,
-                  style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.lightWhiteTextColor,
-                      fontSize: 12.sp),
+                  style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.lightWhiteTextColor, fontSize: widget.titleFontSize),
                 ),
               ),
             ],

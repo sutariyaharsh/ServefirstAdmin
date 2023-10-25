@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -19,14 +17,12 @@ class SkillTypeQuestion extends StatefulWidget {
       required this.question,
       required this.index,
       required this.surveyType,
-      required this.isMultiSelectRequired,
       required this.onCommentTextEntered,
       required this.onWriteInTextEntered})
       : super(key: key);
   final Function(List<String>) onSkillItemsSelected;
   final Function(String) onCommentTextEntered;
   final Function(String) onWriteInTextEntered;
-  final Function(bool) isMultiSelectRequired;
   final Questions question;
   final int index;
   final String surveyType;
@@ -54,22 +50,55 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
     });
   }
 
-  List<String> _selectedIndices = [];
-  List<int> _selectedIndexes = [];
+  final List<String> _selectedIndices = [];
 
-  void _selectItem(int index) {
+  void _selectItem(int index, SurveyController controller) {
     setState(() {
-      if (_selectedIndices.contains(widget.question.options![index].sId!)) {
-        _selectedIndices.remove(widget.question.options![index]
-            .sId!); // Deselect the item if already selected
-      } else {
-        _selectedIndices.add(widget.question.options![index]
-            .sId!); // Select the item if not already selected
-      }
-      if (_selectedIndexes.contains(index)) {
-        _selectedIndexes.remove(index); // Deselect the item if already selected
-      } else {
-        _selectedIndexes.add(index); // Select the item if not already selected
+      if(controller.surveyJsonDataMap[widget.question.sId!]?.value != null){
+        var selectedIndices = (controller.surveyJsonDataMap[widget.question.sId!]?.value ?? []) as List<String>;
+        if (selectedIndices.contains(widget.question.options![index].sId!)) {
+          if (widget.question.minOptions != null) {
+            if (selectedIndices.length > widget.question.minOptions!) {
+              selectedIndices.remove(widget.question.options![index].sId!);
+            } else {
+              showSnackBar(message: "Select Minimum ${widget.question.minOptions} options");
+            }
+          } else {
+            selectedIndices.remove(widget.question.options![index].sId!);
+          }
+        } else {
+          if (widget.question.maxOptions != null) {
+            if (selectedIndices.length < widget.question.maxOptions!) {
+              selectedIndices.add(widget.question.options![index].sId!);
+            } else {
+              showSnackBar(message: "Maximum ${widget.question.maxOptions} options are allowed to select");
+            }
+          } else {
+            selectedIndices.add(widget.question.options![index].sId!);
+          }
+        }
+      }else {
+        if (_selectedIndices.contains(widget.question.options![index].sId!)) {
+          if (widget.question.minOptions != null) {
+            if (_selectedIndices.length > widget.question.minOptions!) {
+              _selectedIndices.remove(widget.question.options![index].sId!);
+            } else {
+              showSnackBar(message: "Select Minimum ${widget.question.minOptions} options");
+            }
+          } else {
+            _selectedIndices.remove(widget.question.options![index].sId!);
+          }
+        } else {
+          if (widget.question.maxOptions != null) {
+            if (_selectedIndices.length < widget.question.maxOptions!) {
+              _selectedIndices.add(widget.question.options![index].sId!);
+            } else {
+              showSnackBar(message: "Maximum ${widget.question.maxOptions} options are allowed to select");
+            }
+          } else {
+            _selectedIndices.add(widget.question.options![index].sId!);
+          }
+        }
       }
       _isShowWriteIn = widget.question.options![index].writeIn!;
     });
@@ -77,17 +106,6 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
 
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      widget.isMultiSelectRequired(widget.question.required ?? false);
-      /*if (widget.surveyController.surveyJsonDataMap[widget.question.sId!]
-              ?.value !=
-          null) {
-        _selectedIndexes = findIndicesByIds(widget.surveyController
-            .surveyJsonDataMap[widget.question.sId!]?.value as List<String>);
-        _selectedIndices = widget.surveyController
-            .surveyJsonDataMap[widget.question.sId!]?.value as List<String>;
-      }*/
-    });
     return GetBuilder<SurveyController>(
       builder: (controller) => Padding(
         padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
@@ -99,25 +117,30 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
               children: [
                 Text(
                   "${widget.index + 1}.",
-                  style: TextStyle(
-                      fontSize: 16.sp,
-                      color: AppTheme.lightPrimaryColor,
-                      fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 16.sp, color: AppTheme.lightPrimaryColor, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(width: 5.h),
                 Expanded(
                   child: Text(
                     "${widget.question.text}",
-                    style: TextStyle(
-                        height: 1.3,
-                        fontSize: 14.sp,
-                        color: AppTheme.lightPrimaryColor,
-                        fontWeight: FontWeight.w500),
+                    style: TextStyle(height: 1.3, fontSize: 14.sp, color: AppTheme.lightPrimaryColor, fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 15.h),
+            SizedBox(height: 5.h),
+            if (widget.question.required ?? false)
+              Obx(
+                () => controller.surveyJsonDataMap[widget.question.sId!]?.value == null
+                    ? Text("* Please select any option",
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          color: AppTheme.lightRed,
+                          fontWeight: FontWeight.w600,
+                        ))
+                    : Container(),
+              ),
+            SizedBox(height: 10.h),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10.w),
               child: Obx(
@@ -128,63 +151,36 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
                     widget.question.options!.length,
                     (index) => GestureDetector(
                       onTap: () {
-                        _selectItem(index);
-                        controller.surveyJsonDataMap[widget.question.sId!]
-                                    ?.value !=
-                                null
-                            ? widget.onSkillItemsSelected((controller
-                                    .surveyJsonDataMap[widget.question.sId!]
-                                    ?.value ??
-                                []) as List<String>)
+                        _selectItem(index, controller);
+                        controller.surveyJsonDataMap[widget.question.sId!]?.value != null
+                            ? widget.onSkillItemsSelected((controller.surveyJsonDataMap[widget.question.sId!]?.value ?? []) as List<String>)
                             : widget.onSkillItemsSelected(_selectedIndices);
                       },
                       child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 15.w, vertical: 10.h),
+                        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(
                               Radius.circular(5.r),
                             ),
-                            color: controller
-                                        .surveyJsonDataMap[widget.question.sId!]
-                                        ?.value !=
-                                    null
-                                ? findIndicesByIds(controller
-                                            .surveyJsonDataMap[
-                                                widget.question.sId!]
-                                            ?.value as List<String>)
-                                        .contains(index)
+                            color: controller.surveyJsonDataMap[widget.question.sId!]?.value != null
+                                ? findIndicesByIds(controller.surveyJsonDataMap[widget.question.sId!]?.value as List<String>).contains(index)
                                     ? AppTheme.lightPrimaryColor
                                     : Colors.transparent
                                 : Colors.transparent,
-                            border: Border.all(
-                                width: 1.w, color: AppTheme.lightPrimaryColor)),
+                            border: Border.all(width: 1.w, color: AppTheme.lightPrimaryColor)),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             SvgIcon(
-                                assetImage: controller
-                                            .surveyJsonDataMap[
-                                                widget.question.sId!]
-                                            ?.value !=
-                                        null
-                                    ? findIndicesByIds(controller
-                                                .surveyJsonDataMap[
-                                                    widget.question.sId!]
-                                                ?.value as List<String>)
-                                            .contains(index)
+                                assetImage: controller.surveyJsonDataMap[widget.question.sId!]?.value != null
+                                    ? findIndicesByIds(controller.surveyJsonDataMap[widget.question.sId!]?.value as List<String>).contains(index)
                                         ? icCheckboxChecked
                                         : icCheckboxUnChecked
                                     : icCheckboxUnChecked,
                                 width: 20.w,
                                 height: 20.h,
-                                color: controller.surveyJsonDataMap[widget.question.sId!]?.value !=
-                                        null
-                                    ? findIndicesByIds(controller
-                                                .surveyJsonDataMap[
-                                                    widget.question.sId!]
-                                                ?.value as List<String>)
-                                            .contains(index)
+                                color: controller.surveyJsonDataMap[widget.question.sId!]?.value != null
+                                    ? findIndicesByIds(controller.surveyJsonDataMap[widget.question.sId!]?.value as List<String>).contains(index)
                                         ? Colors.white
                                         : Colors.black
                                     : Colors.black),
@@ -193,16 +189,8 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
                               child: Text(
                                 '${widget.question.options![index].text}',
                                 style: TextStyle(
-                                    color: controller
-                                                .surveyJsonDataMap[
-                                                    widget.question.sId!]
-                                                ?.value !=
-                                            null
-                                        ? findIndicesByIds(controller
-                                                    .surveyJsonDataMap[
-                                                        widget.question.sId!]
-                                                    ?.value as List<String>)
-                                                .contains(index)
+                                    color: controller.surveyJsonDataMap[widget.question.sId!]?.value != null
+                                        ? findIndicesByIds(controller.surveyJsonDataMap[widget.question.sId!]?.value as List<String>).contains(index)
                                             ? Colors.white
                                             : Colors.black
                                         : Colors.black,
@@ -225,6 +213,12 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
                 onChange: (val) {
                   widget.onWriteInTextEntered(val);
                 },
+                validation: (String? value) {
+                  if (_isShowWriteIn && (value == null || value.isEmpty)) {
+                    return "This field can't be empty";
+                  }
+                  return null;
+                },
               ),
             if (widget.surveyType == "audition")
               Column(
@@ -240,10 +234,7 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
                         children: [
                           Text(
                             "Add Comments",
-                            style: TextStyle(
-                                color: AppTheme.lightPrimaryColor,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w600),
+                            style: TextStyle(color: AppTheme.lightPrimaryColor, fontSize: 14.sp, fontWeight: FontWeight.w600),
                           ),
                           Icon(
                             Icons.add,
@@ -261,8 +252,7 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
                           borderRadius: BorderRadius.all(
                             Radius.circular(6.r),
                           ),
-                          border: Border.all(
-                              width: 1.w, color: AppTheme.lightGray)),
+                          border: Border.all(width: 1.w, color: AppTheme.lightGray)),
                       child: Column(
                         children: [
                           Column(
@@ -274,19 +264,13 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
                                   controller: _commentController,
                                   textDirection: TextDirection.ltr,
                                   cursorColor: AppTheme.lightPrimaryColor,
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 13.sp,
-                                      fontWeight: FontWeight.w500),
+                                  style: TextStyle(color: Colors.black, fontSize: 13.sp, fontWeight: FontWeight.w500),
                                   minLines: 1,
                                   // Set this to control the minimum number of lines to display
                                   maxLines: null,
                                   decoration: InputDecoration(
                                       hintText: "Enter Comment",
-                                      hintStyle: TextStyle(
-                                          color: AppTheme.lightDarkGray,
-                                          fontSize: 13.sp,
-                                          fontWeight: FontWeight.w500),
+                                      hintStyle: TextStyle(color: AppTheme.lightDarkGray, fontSize: 13.sp, fontWeight: FontWeight.w500),
                                       border: InputBorder.none),
                                 ),
                               ),
@@ -294,12 +278,9 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
                                 color: AppTheme.lightPrimaryColor,
                                 onPressed: () {
                                   if (_commentController.text.trim().isEmpty) {
-                                    showSnackBar(
-                                        message:
-                                            "Comment should not be empty!");
+                                    showSnackBar(message: "Comment should not be empty!");
                                   } else {
-                                    widget.onCommentTextEntered(
-                                        _commentController.text);
+                                    widget.onCommentTextEntered(_commentController.text);
                                     _showCommentText();
                                   }
                                 },
@@ -318,8 +299,7 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
                           borderRadius: BorderRadius.all(
                             Radius.circular(6.r),
                           ),
-                          border: Border.all(
-                              width: 1.w, color: AppTheme.lightGray)),
+                          border: Border.all(width: 1.w, color: AppTheme.lightGray)),
                       child: Row(
                         children: [
                           Expanded(
@@ -327,10 +307,7 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
                               padding: EdgeInsets.symmetric(horizontal: 10.w),
                               child: Text(
                                 _commentController.text,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 12.sp,
-                                    color: Colors.black),
+                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12.sp, color: Colors.black),
                               ),
                             ),
                           ),
@@ -344,9 +321,7 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
                                 _isShowCommentInput = false;
                               });
                             },
-                            icon: Icon(Icons.cancel,
-                                color: AppTheme.lightPrimaryColor
-                                    .withOpacity(0.8)),
+                            icon: Icon(Icons.cancel, color: AppTheme.lightPrimaryColor.withOpacity(0.8)),
                           ),
                         ],
                       ),
@@ -361,10 +336,7 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
                       children: [
                         Text(
                           "Upload Image",
-                          style: TextStyle(
-                              color: AppTheme.lightPrimaryColor,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600),
+                          style: TextStyle(color: AppTheme.lightPrimaryColor, fontSize: 14.sp, fontWeight: FontWeight.w600),
                         ),
                         Icon(
                           Icons.add,
@@ -379,14 +351,10 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
                     () => ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: controller
-                              .imageFileAuditionListMap[widget.question.sId]
-                              ?.length ??
-                          0,
+                      itemCount: controller.imageFileAuditionListMap[widget.question.sId]?.length ?? 0,
                       itemBuilder: (context, index) {
                         final pickedImage = /*File(*/
-                            controller.imageFileAuditionListMap[
-                                widget.question.sId]![index]/*)*/;
+                            controller.imageFileAuditionListMap[widget.question.sId]![index] /*)*/;
                         return Container(
                           margin: EdgeInsets.symmetric(vertical: 5.h),
                           padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -394,8 +362,7 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
                               borderRadius: BorderRadius.all(
                                 Radius.circular(5.r),
                               ),
-                              border: Border.all(
-                                  width: 1.w, color: AppTheme.lightGray)),
+                              border: Border.all(width: 1.w, color: AppTheme.lightGray)),
                           child: ListTile(
                             leading: Container(
                               width: 55.w,
@@ -413,17 +380,14 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
                             title: Text(
                               /*pickedImage.path
                                   .split(Platform.pathSeparator)
-                                  .last*/"Image Name",
+                                  .last*/
+                              "Image Name",
                               maxLines: 1,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12.sp,
-                                  color: AppTheme.lightGrayTextColor),
+                              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12.sp, color: AppTheme.lightGrayTextColor),
                             ),
                             // Replace with the actual image name
                             trailing: GestureDetector(
-                              onTap: () => controller.removeImageToAuditionMap(
-                                  widget.question.sId!, index),
+                              onTap: () => controller.removeImageToAuditionMap(widget.question.sId!, index),
                               child: Icon(
                                 Icons.delete,
                                 color: AppTheme.lightRed,
@@ -453,12 +417,10 @@ class _SkillTypeQuestionState extends State<SkillTypeQuestion> {
             children: <Widget>[
               _buildOptionButton('Camera', () {
                 Navigator.of(context).pop();
-                controller.pickImage(ImageSource.camera,
-                    widget.question.questionType!, widget.question.sId!);
+                controller.pickImage(ImageSource.camera, widget.question.questionType!, widget.question.sId!);
               }),
               _buildOptionButton('Gallery', () {
-                controller.pickImage(ImageSource.gallery,
-                    widget.question.questionType!, widget.question.sId!);
+                controller.pickImage(ImageSource.gallery, widget.question.questionType!, widget.question.sId!);
               }),
               _buildOptionButton('Cancel', () {
                 // Handle Cancel option

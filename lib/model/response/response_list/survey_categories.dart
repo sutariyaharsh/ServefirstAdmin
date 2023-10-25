@@ -1,4 +1,3 @@
-
 import 'package:hive/hive.dart';
 
 part 'survey_categories.g.dart';
@@ -20,8 +19,11 @@ class SurveyCategories {
   }
 
   String? get sId => _sId;
+
   set sId(String? sId) => _sId = sId;
+
   String? get name => _name;
+
   set name(String? name) => _name = name;
 
   SurveyCategories.fromJson(Map<String, dynamic> json) {

@@ -17,20 +17,14 @@ class SurveysController extends GetxController {
   @override
   void onInit() async {
     await _localGetLocationSurveysService.init();
-    locationList.assignAll(
-        _localGetLocationSurveysService.getLocationSurveyData()?.location ??
-            []);
+    locationList.assignAll(_localGetLocationSurveysService.getLocationSurveyData()?.location ?? []);
     surveyList.clear();
     if (locationList.isNotEmpty) {
       locationId.value = locationList[index].sId!;
       surveyList.assignAll(locationList[index].surveys ?? []);
-      surveyList.addAll(
-          _localGetLocationSurveysService.getLocationSurveyData()?.global ??
-              []);
+      surveyList.addAll(_localGetLocationSurveysService.getLocationSurveyData()?.global ?? []);
     } else {
-      surveyList.assignAll(
-          _localGetLocationSurveysService.getLocationSurveyData()?.global ??
-              []);
+      surveyList.assignAll(_localGetLocationSurveysService.getLocationSurveyData()?.global ?? []);
     }
     super.onInit();
   }
