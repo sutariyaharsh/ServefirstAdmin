@@ -20,16 +20,18 @@ class OptionsAdapter extends TypeAdapter<Options> {
       .._text = fields[0] as String?
       .._value = fields[1] as int?
       .._iconClass = fields[2] as String?
-      .._writeIn = fields[3] as bool?
-      .._finishSurvey = fields[4] as bool?
-      .._routeToIndex = fields[5] as int?
-      .._sId = fields[6] as String?;
+      .._imageUrl = fields[3] as String?
+      .._aImageUrl = fields[4] as Uint8List?
+      .._writeIn = fields[5] as bool?
+      .._finishSurvey = fields[6] as bool?
+      .._routeToIndex = fields[7] as int?
+      .._sId = fields[8] as String?;
   }
 
   @override
   void write(BinaryWriter writer, Options obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj._text)
       ..writeByte(1)
@@ -37,12 +39,16 @@ class OptionsAdapter extends TypeAdapter<Options> {
       ..writeByte(2)
       ..write(obj._iconClass)
       ..writeByte(3)
-      ..write(obj._writeIn)
+      ..write(obj._imageUrl)
       ..writeByte(4)
-      ..write(obj._finishSurvey)
+      ..write(obj._aImageUrl)
       ..writeByte(5)
-      ..write(obj._routeToIndex)
+      ..write(obj._writeIn)
       ..writeByte(6)
+      ..write(obj._finishSurvey)
+      ..writeByte(7)
+      ..write(obj._routeToIndex)
+      ..writeByte(8)
       ..write(obj._sId);
   }
 

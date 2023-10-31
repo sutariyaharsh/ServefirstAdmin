@@ -11,6 +11,7 @@ class CircularProgressResponse extends StatelessWidget {
     required this.value,
     required this.trackColor,
     required this.title,
+    required this.isPortrait,
   });
 
   final String valueText;
@@ -18,6 +19,7 @@ class CircularProgressResponse extends StatelessWidget {
   final double value;
   final Color trackColor;
   final String title;
+  final bool isPortrait;
 
   @override
   Widget build(BuildContext context) {
@@ -27,34 +29,34 @@ class CircularProgressResponse extends StatelessWidget {
           alignment: Alignment.center,
           children: [
             SizedBox(
-              height: 75.h,
-              width: 75.w,
+              height: isPortrait ? 75 : 130,
+              width: isPortrait ? 75 : 130,
               child: CurvedCircularProgressIndicator(
                 value: value,
                 animationDuration: const Duration(seconds: 1),
                 backgroundColor: AppTheme.lightMediumGrayColor,
                 color: trackColor,
-                strokeWidth: 9.w,
+                strokeWidth: isPortrait ? 9.w : 4.w,
               ),
             ),
             Column(
               children: [
                 Text(
                   valueText,
-                  style: TextStyle(fontSize: 14.sp, color: Colors.black, fontWeight: FontWeight.w400),
+                  style: TextStyle(fontSize: isPortrait ? 14.sp : 9.sp, color: Colors.black, fontWeight: FontWeight.w400),
                 ),
                 Text(
                   subtitle,
-                  style: TextStyle(fontSize: 10.sp, color: AppTheme.lightTextColor, fontWeight: FontWeight.w400),
+                  style: TextStyle(fontSize: isPortrait ? 10.sp : 6.sp, color: AppTheme.lightTextColor, fontWeight: FontWeight.w400),
                 ),
               ],
             ),
           ],
         ),
-        SizedBox(height: 12.h),
+        SizedBox(height: isPortrait ? 12.h : 24.h),
         Text(
           title,
-          style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, color: AppTheme.lightGrayTextColor),
+          style: TextStyle(fontSize: isPortrait ? 14.sp : 10.sp, fontWeight: FontWeight.w500, color: AppTheme.lightGrayTextColor),
         ),
       ],
     );

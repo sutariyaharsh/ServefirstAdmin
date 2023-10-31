@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -18,6 +18,8 @@ import 'package:servefirst_admin/model/response/location_survey/employee.dart';
 import 'package:servefirst_admin/model/response/location_survey/location.dart';
 import 'package:servefirst_admin/model/response/location_survey/location_survey_data.dart';
 import 'package:servefirst_admin/model/response/location_survey/location_surveys.dart';
+import 'package:servefirst_admin/model/response/location_survey/options.dart';
+import 'package:servefirst_admin/model/response/location_survey/question.dart';
 import 'package:servefirst_admin/model/response/location_survey/survey.dart';
 import 'package:servefirst_admin/model/response/survey_dashboard/survey_dashboard.dart';
 import 'package:servefirst_admin/model/response/survey_dashboard/survey_dashboard_data.dart';
@@ -91,13 +93,13 @@ class ReportController extends GetxController {
   }
 
   Future<void> getLocationSurveys(bool forceUpdate) async {
-    if(!forceUpdate){
+    if (!forceUpdate) {
       isDateSameForApiCall().then((isSame) async {
         if (!isSame) {
           await getLocationSurveysData();
         }
       });
-    }else {
+    } else {
       await getLocationSurveysData();
     }
   }
@@ -121,9 +123,97 @@ class ReportController extends GetxController {
         if (result.statusCode == 200) {
           LocationSurveys locationSurveys = LocationSurveys.fromJson(jsonDecode(result.body));
           if (locationSurveys.status == 200) {
-            await _localGetLocationSurveysService.addLocationSurveyData(locationSurveyData: locationSurveys.data ?? LocationSurveyData());
+            //await _localGetLocationSurveysService.addLocationSurveyData(locationSurveyData: locationSurveys.data ?? LocationSurveyData());
             locationList.assignAll(locationSurveys.data?.location ?? []);
             surveyList.assignAll(locationSurveys.data?.global ?? []);
+
+            LocationSurveyData savedLocationSurveyData = LocationSurveyData();
+            List<Location> localLocations = [];
+            if ((locationSurveys.data!.location ?? []).isNotEmpty) {
+              for (Location location in locationSurveys.data!.location ?? []) {
+                List<Survey> localSurvey = [];
+                if ((location.surveys ?? []).isNotEmpty) {
+                  for (Survey survey in location.surveys ?? []) {
+                    List<Questions> localQuestion = [];
+                    if ((survey.questions ?? []).isNotEmpty) {
+                      for (Questions question in survey.questions ?? []) {
+                        List<Uint8List> localImages = [];
+                        List<Options> localOptions = [];
+                        if ((question.images ?? []).isNotEmpty) {
+                          for (int i = 0; i < (question.images ?? []).length; i++) {
+                            final imageResponse = await http.get(Uri.parse(question.images![i]));
+                            final imagePath = await saveImageLocally(imageResponse.bodyBytes, "${question.sId}_$i");
+                            final imageUint8List = await getImageAsUint8List(imagePath);
+                            localImages.add(imageUint8List!);
+                          }
+                        }
+                        question.qImages = localImages;
+
+                        if ((question.options ?? []).isNotEmpty) {
+                          for (Options option in question.options ?? []) {
+                            if ((option.imageUrl ?? "").isNotEmpty) {
+                              final imageResponse = await http.get(Uri.parse(option.imageUrl!));
+                              final imagePath = await saveImageLocally(imageResponse.bodyBytes, "${option.sId}");
+                              final imageUint8List = await getImageAsUint8List(imagePath);
+                              option.aImageUrl = imageUint8List;
+                            }
+                            localOptions.add(option);
+                          }
+                        }
+                        question.options = localOptions;
+                        localQuestion.add(question);
+                      }
+                    }
+                    survey.questions = localQuestion;
+                    localSurvey.add(survey);
+                  }
+                }
+                location.surveys = localSurvey;
+                localLocations.add(location);
+              }
+            }
+
+            List<Survey> localSurvey = [];
+            if ((locationSurveys.data!.global ?? []).isNotEmpty) {
+              for (Survey survey in locationSurveys.data!.global ?? []) {
+                List<Questions> localQuestion = [];
+                if ((survey.questions ?? []).isNotEmpty) {
+                  for (Questions question in survey.questions ?? []) {
+                    List<Uint8List> localImages = [];
+                    List<Options> localOptions = [];
+                    if ((question.images ?? []).isNotEmpty) {
+                      for (int i = 0; i < (question.images ?? []).length; i++) {
+                        final imageResponse = await http.get(Uri.parse(question.images![i]));
+                        final imagePath = await saveImageLocally(imageResponse.bodyBytes, "${question.sId}_$i");
+                        final imageUint8List = await getImageAsUint8List(imagePath);
+                        localImages.add(imageUint8List!);
+                      }
+                    }
+                    question.qImages = localImages;
+
+                    if ((question.options ?? []).isNotEmpty) {
+                      for (Options option in question.options ?? []) {
+                        if ((option.imageUrl ?? "").isNotEmpty) {
+                          final imageResponse = await http.get(Uri.parse(option.imageUrl!));
+                          final imagePath = await saveImageLocally(imageResponse.bodyBytes, "${option.sId}");
+                          final imageUint8List = await getImageAsUint8List(imagePath);
+                          option.aImageUrl = imageUint8List;
+                        }
+                        localOptions.add(option);
+                      }
+                    }
+                    question.options = localOptions;
+                    localQuestion.add(question);
+                  }
+                }
+                survey.questions = localQuestion;
+                localSurvey.add(survey);
+              }
+            }
+            savedLocationSurveyData.location = localLocations;
+            savedLocationSurveyData.global = localSurvey;
+
+            await _localGetLocationSurveysService.addLocationSurveyData(locationSurveyData: savedLocationSurveyData);
 
             List<Employee> employees = [];
             for (var location in locationSurveys.data!.location ?? []) {
@@ -171,29 +261,6 @@ class ReportController extends GetxController {
     final File imageFile = File(imagePath);
     await imageFile.writeAsBytes(imageBytes);
     return imagePath;
-  }
-
-  Future<String?> _downloadAndStoreImage(String imageUrl, String id) async {
-    try {
-      final response = await http.get(Uri.parse(imageUrl));
-      if (response.statusCode == 200) {
-        // Get the temporary directory for the app
-        final appDir = await getTemporaryDirectory();
-        final imagePath = "${appDir.path}/$id.png";
-
-        // Write the image data to the file
-        final file = File(imagePath);
-        await file.writeAsBytes(response.bodyBytes);
-        print("imagePath - $imagePath");
-        return imagePath;
-      }
-    } catch (e) {
-      print("Error downloading image: $e");
-      return imageUrl;
-    }
-
-    // Return null if there's an error or if the image couldn't be downloaded
-    return imageUrl;
   }
 
   Future<void> getSurveyDashboardData() async {
@@ -246,5 +313,14 @@ class ReportController extends GetxController {
     filterTitle.value = "Custom Range";
     filterDates.value = await selectCustomDateRange(Get.context!);
     await getSurveyDashboardData();
+  }
+
+  Future<Uint8List?> getImageAsUint8List(String imagePath) async {
+    final file = File(imagePath);
+    if (await file.exists()) {
+      final Uint8List uint8list = await file.readAsBytes();
+      return uint8list;
+    }
+    return null;
   }
 }

@@ -32,108 +32,113 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<LoginController>(
-      builder: (controller) => Scaffold(
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 115.h),
-                Center(child: SvgIcon(assetImage: icTextLogo)),
-                SizedBox(height: 35.h),
-                Text(
-                  sWelcome,
-                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 24.sp),
-                ),
-                SizedBox(height: 35.h),
-                Text(
-                  sLoginTitle,
-                  style: TextStyle(fontSize: 16.sp),
-                ),
-                SizedBox(height: 35.h),
-                Form(
-                  key: _formKey,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 25.w),
-                        child: MyTextField(
-                          hint: sEmailHint,
-                          textEditingController: _emailController,
-                          validation: (String? value) {
-                            if (value == null || value.isEmpty) {
-                              return "This field can't be empty";
-                            } else if (!value.isValidEmail) {
-                              return "Please enter valid email";
-                            }
-                            return null;
-                          },
-                          prefixIcon: Icons.alternate_email,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 15.h,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 25.w),
-                        child: MyTextField(
-                          obsecureText: true,
-                          hint: sPasswordHint,
-                          textEditingController: _passwordController,
-                          validation: (String? value) {
-                            if (value == null || value.isEmpty) {
-                              return "This field can't be empty";
-                            }
-                            return null;
-                          },
-                          prefixIcon: Icons.lock_outline,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 20.h,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 25.w),
-                        child: Text(
-                          sForgotPassword,
-                          style: TextStyle(fontSize: 16.sp, color: AppTheme.lightPrimaryColor),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 20.h,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 25.w),
-                        child: MyButton(
-                            onTap: () {
-                              if (_formKey.currentState!.validate()) {
-                                controller.login(email: _emailController.text, password: _passwordController.text);
-                                /*Navigator.push(context, MaterialPageRoute(builder: (context){
-                              return DashboardScreen();
-                            }));*/
-                              }
-                            },
-                            buttonText: sContinue),
-                      ),
-                    ],
+    return LayoutBuilder(builder: (context, constraints) {
+      final isPortrait = constraints.maxWidth < 768;
+      return GetBuilder<LoginController>(
+        builder: (controller) => Scaffold(
+          body: SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: isPortrait ? 115.h : 75.h),
+                  Center(child: SvgIcon(assetImage: icTextLogo)),
+                  SizedBox(height: isPortrait ? 35.h : 25.h),
+                  Text(
+                    sWelcome,
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: isPortrait ? 24.sp : 14.sp),
                   ),
-                ),
-                SizedBox(height: 125.h),
-                Text.rich(
-                  TextSpan(text: sNotHaveAccount, style: TextStyle(fontFamily: 'Nexa', fontSize: 16.sp, color: Colors.grey), children: [
+                  SizedBox(height: 35.h),
+                  Text(sLoginTitle, style: TextStyle(fontSize: isPortrait ? 16.sp : 10.sp)),
+                  SizedBox(height: 35.h),
+                  Form(
+                    key: _formKey,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 25.w),
+                          child: MyTextField(
+                            hint: sEmailHint,
+                            isPortrait: isPortrait,
+                            textEditingController: _emailController,
+                            validation: (String? value) {
+                              if (value == null || value.isEmpty) {
+                                return "This field can't be empty";
+                              } else if (!value.isValidEmail) {
+                                return "Please enter valid email";
+                              }
+                              return null;
+                            },
+                            prefixIcon: Icons.alternate_email,
+                          ),
+                        ),
+                        SizedBox(height: 15.h),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 25.w),
+                          child: MyTextField(
+                            obsecureText: true,
+                            hint: sPasswordHint,
+                            isPortrait: isPortrait,
+                            textEditingController: _passwordController,
+                            validation: (String? value) {
+                              if (value == null || value.isEmpty) {
+                                return "This field can't be empty";
+                              }
+                              return null;
+                            },
+                            prefixIcon: Icons.lock_outline,
+                          ),
+                        ),
+                        SizedBox(height: 20.h),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 25.w),
+                          child: Text(
+                            sForgotPassword,
+                            style: TextStyle(fontSize: isPortrait ? 16.sp : 8.sp, color: AppTheme.lightPrimaryColor),
+                          ),
+                        ),
+                        SizedBox(height: 20.h),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 25.w),
+                          child: MyButton(
+                              isPortrait: isPortrait,
+                              onTap: () {
+                                if (_formKey.currentState!.validate()) {
+                                  controller.login(email: _emailController.text, password: _passwordController.text);
+                                  /*Navigator.push(context, MaterialPageRoute(builder: (context){
+                                return DashboardScreen();
+                              }));*/
+                                }
+                              },
+                              fontSize: isPortrait ? 14.sp : 8.sp,
+                              buttonText: sContinue),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: isPortrait ? 125.h : 75.h),
+                  Text.rich(
                     TextSpan(
-                        text: sSignUp,
-                        style: TextStyle(fontFamily: 'Nexa', fontSize: 16.sp, fontWeight: FontWeight.w500, color: AppTheme.lightPrimaryColor))
-                  ]),
-                ),
-              ],
+                        text: sNotHaveAccount,
+                        style: TextStyle(fontFamily: 'Nexa', fontSize: isPortrait ? 16.sp : 10.sp, color: Colors.grey),
+                        children: [
+                          TextSpan(
+                              text: sSignUp,
+                              style: TextStyle(
+                                  fontFamily: 'Nexa',
+                                  fontSize: isPortrait ? 16.sp : 10.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppTheme.lightPrimaryColor))
+                        ]),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

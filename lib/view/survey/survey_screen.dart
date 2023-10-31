@@ -107,271 +107,283 @@ class _SurveyScreenState extends State<SurveyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<SurveyController>(
-        builder: (controller) => WillPopScope(
-              onWillPop: () async {
-                if (controller.questionIndex.value == 0) {
-                  if (controller.surveyJsonDataMap.isNotEmpty) {
-                    showCustomDialog(context);
+    return LayoutBuilder(builder: (context, constraints) {
+      final isPortrait = constraints.maxWidth < 768;
+      return GetBuilder<SurveyController>(
+          builder: (controller) => WillPopScope(
+                onWillPop: () async {
+                  if (controller.questionIndex.value == 0) {
+                    if (controller.surveyJsonDataMap.isNotEmpty) {
+                      showCustomDialog(context, isPortrait);
+                    } else {
+                      Get.back();
+                    }
                   } else {
-                    Get.back();
+                    _pageController.previousPage(
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.ease,
+                    );
                   }
-                } else {
-                  _pageController.previousPage(
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.ease,
-                  );
-                }
-                return false;
-              },
-              child: Listener(
-                onPointerDown: (_) {
-                  userInteracted = true;
-                  resetIdealTimer();
+                  return false;
                 },
-                child: Scaffold(
-                  extendBody: true,
-                  appBar: AppBar(
-                    backgroundColor: Colors.transparent,
-                    title: Text(
-                      widget.survey.name ?? "",
-                      style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400, color: AppTheme.lightGrayTextColor),
-                    ),
-                    elevation: 0,
-                    centerTitle: false,
-                    titleSpacing: -15,
-                    leading: IconButton(
-                      icon: Icon(
-                        Icons.arrow_back_ios,
-                        color: AppTheme.lightGrayTextColor,
+                child: Listener(
+                  onPointerDown: (_) {
+                    userInteracted = true;
+                    resetIdealTimer();
+                  },
+                  child: Scaffold(
+                    extendBody: true,
+                    appBar: AppBar(
+                      backgroundColor: Colors.transparent,
+                      title: Text(
+                        widget.survey.name ?? "",
+                        style: TextStyle(fontSize: isPortrait ? 16.sp : 10.sp, fontWeight: FontWeight.w400, color: AppTheme.lightGrayTextColor),
                       ),
-                      onPressed: () {
-                        if (controller.questionIndex.value == 0) {
-                          if (controller.surveyJsonDataMap.isNotEmpty) {
-                            showCustomDialog(context);
+                      elevation: 0,
+                      centerTitle: false,
+                      titleSpacing: -15,
+                      leading: IconButton(
+                        icon: Icon(
+                          Icons.arrow_back_ios,
+                          color: AppTheme.lightGrayTextColor,
+                        ),
+                        onPressed: () {
+                          if (controller.questionIndex.value == 0) {
+                            if (controller.surveyJsonDataMap.isNotEmpty) {
+                              showCustomDialog(context, isPortrait);
+                            } else {
+                              Get.back();
+                            }
                           } else {
-                            Get.back();
+                            _pageController.previousPage(
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.ease,
+                            );
                           }
-                        } else {
-                          _pageController.previousPage(
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.ease,
-                          );
-                        }
-                      },
+                        },
+                      ),
                     ),
-                  ),
-                  body: SafeArea(
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 10.h),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 15.w),
-                            child: SliderTheme(
-                              data: SliderThemeData(
-                                thumbShape: SliderComponentShape.noThumb,
-                                overlayShape: SliderComponentShape.noOverlay,
-                                trackHeight: 8.h,
-                                inactiveTrackColor: AppTheme.lightLighterGray,
-                                activeTrackColor: AppTheme.lightPrimaryColor,
+                    body: SafeArea(
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: isPortrait ? 10.h : 20.h),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: isPortrait ? 15.w : 7.5.w),
+                              child: SliderTheme(
+                                data: SliderThemeData(
+                                  thumbShape: SliderComponentShape.noThumb,
+                                  overlayShape: SliderComponentShape.noOverlay,
+                                  trackHeight: 8.h,
+                                  inactiveTrackColor: AppTheme.lightLighterGray,
+                                  activeTrackColor: AppTheme.lightPrimaryColor,
+                                ),
+                                child: Obx(
+                                  () => Slider(
+                                    value: controller.questionIndex.value + 1,
+                                    max: totalPages.toDouble(),
+                                    onChanged: (double value) {},
+                                  ),
+                                ),
                               ),
+                            ),
+                            SizedBox(height: isPortrait ? 15.h : 30.h),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: isPortrait ? 15.w : 7.5.w),
                               child: Obx(
-                                () => Slider(
-                                  value: controller.questionIndex.value + 1,
-                                  max: totalPages.toDouble(),
-                                  onChanged: (double value) {},
+                                () => Text(
+                                  questionPerPage == 1
+                                      ? "Question ${controller.startIndex.value + 1} / ${listQuestion.length}"
+                                      : "Questions ${controller.startIndex.value + 1}-${controller.endIndex.value} / ${listQuestion.length}",
+                                  style: TextStyle(
+                                    fontSize: isPortrait ? 16.sp : 10.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.orange,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          SizedBox(height: 15.h),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 15.w),
-                            child: Obx(
-                              () => Text(
-                                questionPerPage == 1
-                                    ? "Question ${controller.startIndex.value + 1} / ${listQuestion.length}"
-                                    : "Questions ${controller.startIndex.value + 1}-${controller.endIndex.value} / ${listQuestion.length}",
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.orange,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 10.h),
-                          Expanded(
-                            child: PageView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                controller: _pageController,
-                                itemCount: totalPages,
-                                onPageChanged: (page) {
-                                  controller.questionIndex.value = page;
-                                  controller.startIndex.value = 0;
-                                  controller.endIndex.value = 0;
-                                  if (controller.isHelpDesk.value) {
-                                    if (page != 0) {
-                                      if ((page - 1) == 0) {
+                            SizedBox(height: isPortrait ? 10.h : 15.h),
+                            Expanded(
+                              child: PageView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  controller: _pageController,
+                                  itemCount: totalPages,
+                                  onPageChanged: (page) {
+                                    controller.questionIndex.value = page;
+                                    controller.startIndex.value = 0;
+                                    controller.endIndex.value = 0;
+                                    if (controller.isHelpDesk.value) {
+                                      if (page != 0) {
+                                        if ((page - 1) == 0) {
+                                          controller.endIndex.value = math.min(listQuestion.length, questionPerPage);
+                                        } else {
+                                          controller.startIndex.value = (page - 1) * questionPerPage;
+                                          if (questionPerPage == 1) {
+                                            controller.endIndex.value = (page - 1) * questionPerPage + 1;
+                                          } else {
+                                            controller.endIndex.value = math.min(
+                                              listQuestion.length,
+                                              ((page - 1) * questionPerPage) + questionPerPage,
+                                            );
+                                          }
+                                        }
+                                      }
+                                    } else {
+                                      if (page == 0) {
                                         controller.endIndex.value = math.min(listQuestion.length, questionPerPage);
                                       } else {
-                                        controller.startIndex.value = (page - 1) * questionPerPage;
+                                        controller.startIndex.value = page * questionPerPage;
                                         if (questionPerPage == 1) {
-                                          controller.endIndex.value = (page - 1) * questionPerPage + 1;
+                                          controller.endIndex.value = page * questionPerPage + 1;
                                         } else {
                                           controller.endIndex.value = math.min(
                                             listQuestion.length,
-                                            ((page - 1) * questionPerPage) + questionPerPage,
+                                            (page * questionPerPage) + questionPerPage,
                                           );
                                         }
                                       }
                                     }
-                                  } else {
-                                    if (page == 0) {
-                                      controller.endIndex.value = math.min(listQuestion.length, questionPerPage);
-                                    } else {
-                                      controller.startIndex.value = page * questionPerPage;
-                                      if (questionPerPage == 1) {
-                                        controller.endIndex.value = page * questionPerPage + 1;
-                                      } else {
-                                        controller.endIndex.value = math.min(
-                                          listQuestion.length,
-                                          (page * questionPerPage) + questionPerPage,
-                                        );
-                                      }
-                                    }
-                                  }
-                                  log("${controller.questionIndex.value} & $page", name: "Current page");
-                                },
-                                itemBuilder: (context, index) {
-                                  return Obx(
-                                    () => SingleChildScrollView(
-                                      physics: const AlwaysScrollableScrollPhysics(),
-                                      child: controller.isHelpDesk.value
-                                          ? (index == 0)
-                                              ? Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                  children: [
-                                                    Padding(
-                                                      padding: EdgeInsets.symmetric(horizontal: 12.w),
-                                                      child: Text("Can we get in touch with you about your experience today ?",
-                                                          style: TextStyle(fontSize: 14.sp, color: Colors.black, fontWeight: FontWeight.w500)),
-                                                    ),
-                                                    SizedBox(height: 15.h),
-                                                    Padding(
-                                                      padding: EdgeInsets.symmetric(horizontal: 12.w),
-                                                      child: Text(
-                                                          "Leave an email or phone number if you want us to get in touch; otherwise, just leave it blank.",
-                                                          style:
-                                                              TextStyle(fontSize: 12.sp, color: AppTheme.lightDarkGray, fontWeight: FontWeight.w500)),
-                                                    ),
-                                                    SizedBox(height: 25.h),
-                                                    Padding(
-                                                      padding: EdgeInsets.symmetric(horizontal: 12.w),
-                                                      child: MyTextField(
-                                                        textEditingController: controller.helpDeskNameController,
-                                                        hint: "Name",
-                                                        onChange: (val) {
-                                                          controller.helpDeskName.value = val;
-                                                        },
-                                                        textInputType: TextInputType.name,
-                                                        validation: (String? value) {
-                                                          /*if (value == null || value.isEmpty) {
+                                    log("${controller.questionIndex.value} & $page", name: "Current page");
+                                  },
+                                  itemBuilder: (context, index) {
+                                    return Obx(
+                                      () => SingleChildScrollView(
+                                        physics: const AlwaysScrollableScrollPhysics(),
+                                        child: controller.isHelpDesk.value
+                                            ? (index == 0)
+                                                ? Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    children: [
+                                                      Padding(
+                                                        padding: EdgeInsets.symmetric(horizontal: isPortrait ? 12.w : 6.w),
+                                                        child: Text("Can we get in touch with you about your experience today ?",
+                                                            style: TextStyle(
+                                                                fontSize: isPortrait ? 14.sp : 10.sp,
+                                                                color: Colors.black,
+                                                                fontWeight: FontWeight.w500)),
+                                                      ),
+                                                      SizedBox(height: isPortrait ? 15.h : 20.h),
+                                                      Padding(
+                                                        padding: EdgeInsets.symmetric(horizontal: isPortrait ? 12.w : 6.w),
+                                                        child: Text(
+                                                            "Leave an email or phone number if you want us to get in touch; otherwise, just leave it blank.",
+                                                            style: TextStyle(
+                                                                fontSize: isPortrait ? 14.sp : 8.sp,
+                                                                color: AppTheme.lightDarkGray,
+                                                                fontWeight: FontWeight.w500)),
+                                                      ),
+                                                      SizedBox(height: isPortrait ? 25.h : 35.h),
+                                                      Padding(
+                                                        padding: EdgeInsets.symmetric(horizontal: isPortrait ? 12.w : 6.w),
+                                                        child: MyTextField(
+                                                          textEditingController: controller.helpDeskNameController,
+                                                          hint: "Name",
+                                                          isPortrait: isPortrait,
+                                                          onChange: (val) {
+                                                            controller.helpDeskName.value = val;
+                                                          },
+                                                          textInputType: TextInputType.name,
+                                                          validation: (String? value) {
+                                                            /*if (value == null || value.isEmpty) {
                                                             return "This field can't be empty";
                                                           }*/
-                                                          return null;
-                                                        },
-                                                      ),
-                                                    ),
-                                                    SizedBox(height: 15.h),
-                                                    Padding(
-                                                      padding: EdgeInsets.symmetric(horizontal: 12.w),
-                                                      child: MyTextField(
-                                                        textEditingController: controller.helpDeskEmailController,
-                                                        hint: "Email",
-                                                        onChange: (val) {
-                                                          controller.helpDeskEmail.value = val;
-                                                        },
-                                                        textInputType: TextInputType.emailAddress,
-                                                        validation: (String? value) {
-                                                          if (value == null || value.isEmpty) {
                                                             return null;
-                                                          } else if (!value.isValidEmail) {
-                                                            return "Please enter valid email";
-                                                          }
-                                                          return null;
-                                                        },
+                                                          },
+                                                        ),
                                                       ),
-                                                    ),
-                                                    SizedBox(height: 15.h),
-                                                    Padding(
-                                                      padding: EdgeInsets.symmetric(horizontal: 12.w),
-                                                      child: MyTextField(
-                                                        textEditingController: controller.helpDeskPhoneController,
-                                                        hint: "Phone Number",
-                                                        onChange: (val) {
-                                                          controller.helpDeskPhone.value = val;
-                                                        },
-                                                        textInputType: TextInputType.phone,
-                                                        validation: (String? value) {
-                                                          if (value == null || value.isEmpty) {
+                                                      SizedBox(height: isPortrait ? 15.h : 20.h),
+                                                      Padding(
+                                                        padding: EdgeInsets.symmetric(horizontal: isPortrait ? 12.w : 6.w),
+                                                        child: MyTextField(
+                                                          textEditingController: controller.helpDeskEmailController,
+                                                          hint: "Email",
+                                                          isPortrait: isPortrait,
+                                                          onChange: (val) {
+                                                            controller.helpDeskEmail.value = val;
+                                                          },
+                                                          textInputType: TextInputType.emailAddress,
+                                                          validation: (String? value) {
+                                                            if (value == null || value.isEmpty) {
+                                                              return null;
+                                                            } else if (!value.isValidEmail) {
+                                                              return "Please enter valid email";
+                                                            }
                                                             return null;
-                                                          } else if (!value.isValidPhone) {
-                                                            return "Please enter valid phone number";
-                                                          }
-                                                          return null;
-                                                        },
+                                                          },
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ],
-                                                )
-                                              : Column(
-                                                  children: questionsList(controller.startIndex.value, controller.endIndex.value,
-                                                      widget.survey.surveyType ?? '', controller),
-                                                )
-                                          : Column(
-                                              children: questionsList(
-                                                  controller.startIndex.value, controller.endIndex.value, widget.survey.surveyType ?? '', controller),
-                                            ),
-                                    ),
-                                  );
-                                }),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                            child: Obx(
-                              () => MyButton(
-                                  onTap: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      if (controller.questionIndex.value == (totalPages - 1)) {
-                                        /** Data submit **/
-                                        if (controller.requiredList.isNotEmpty) {
-                                          showSnackBar(message: "Please fill required questions");
-                                          log("requiredList : ${jsonEncode(controller.requiredList)}", name: "MyButton");
-                                          return;
-                                        }
-                                        await controller.saveDataAndCallApi();
-                                      } else {
-                                        _pageController.nextPage(
-                                          duration: const Duration(milliseconds: 500),
-                                          curve: Curves.ease,
-                                        );
-                                      }
-                                    }
-                                  },
-                                  buttonText: controller.questionIndex.value == (totalPages - 1) ? "Submit" : "Next"),
+                                                      SizedBox(height: isPortrait ? 15.h : 20.h),
+                                                      Padding(
+                                                        padding: EdgeInsets.symmetric(horizontal: isPortrait ? 12.w : 6.w),
+                                                        child: MyTextField(
+                                                          textEditingController: controller.helpDeskPhoneController,
+                                                          hint: "Phone Number",
+                                                          isPortrait: isPortrait,
+                                                          onChange: (val) {
+                                                            controller.helpDeskPhone.value = val;
+                                                          },
+                                                          textInputType: TextInputType.phone,
+                                                          validation: (String? value) {
+                                                            if (value == null || value.isEmpty) {
+                                                              return null;
+                                                            } else if (!value.isValidPhone) {
+                                                              return "Please enter valid phone number";
+                                                            }
+                                                            return null;
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                : Column(
+                                                    children: questionsList(controller.startIndex.value, controller.endIndex.value,
+                                                        widget.survey.surveyType ?? '', controller, isPortrait),
+                                                  )
+                                            : Column(
+                                                children: questionsList(controller.startIndex.value, controller.endIndex.value,
+                                                    widget.survey.surveyType ?? '', controller, isPortrait),
+                                              ),
+                                      ),
+                                    );
+                                  }),
                             ),
-                          )
-                        ],
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: isPortrait ? 20.w : 10.w, vertical: isPortrait ? 10.h : 20.h),
+                              child: Obx(
+                                () => MyButton(
+                                    isPortrait: isPortrait,
+                                    onTap: () async {
+                                      if (_formKey.currentState!.validate()) {
+                                        if (controller.questionIndex.value == (totalPages - 1)) {
+                                          /** Data submit **/
+                                          if (controller.requiredList.isNotEmpty) {
+                                            showSnackBar(message: "Please fill required questions");
+                                            log("requiredList : ${jsonEncode(controller.requiredList)}", name: "MyButton");
+                                            return;
+                                          }
+                                          await controller.saveDataAndCallApi();
+                                        } else {
+                                          _pageController.nextPage(
+                                            duration: const Duration(milliseconds: 500),
+                                            curve: Curves.ease,
+                                          );
+                                        }
+                                      }
+                                    },
+                                    buttonText: controller.questionIndex.value == (totalPages - 1) ? "Submit" : "Next"),
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ));
+              ));
+    });
   }
 
   void scrollToWidget(int index, List<GlobalKey<State>> widgetKeys) {
@@ -387,7 +399,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
     }
   }
 
-  List<Widget> questionsList(int startIndex, int endIndex, String surveyType, SurveyController surveyController) {
+  List<Widget> questionsList(int startIndex, int endIndex, String surveyType, SurveyController surveyController, bool isPortrait) {
     List<GlobalKey<State>> widgetKeys = List.generate(listQuestion.length, (index) => GlobalKey());
     List<Widget> questionsList = [];
     for (int i = startIndex; i < endIndex; i++) {
@@ -401,6 +413,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
               child: Opacity(
                 opacity: widgetDisabledRouting[listQuestion[i].sId]! ? 0.5 : 1.0,
                 child: RatingTypeQuestion(
+                  isPortrait: isPortrait,
                   key: widgetKeys[i],
                   question: listQuestion[i],
                   index: i,
@@ -462,6 +475,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
               child: Opacity(
                 opacity: widgetDisabledRouting[listQuestion[i].sId]! ? 0.5 : 1.0,
                 child: MultiSelectTypeQuestion(
+                  isPortrait: isPortrait,
                   key: widgetKeys[i],
                   question: listQuestion[i],
                   index: i,
@@ -506,6 +520,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
               child: Opacity(
                 opacity: widgetDisabledRouting[listQuestion[i].sId]! ? 0.5 : 1.0,
                 child: SkillTypeQuestion(
+                  isPortrait: isPortrait,
                   key: widgetKeys[i],
                   question: listQuestion[i],
                   index: i,
@@ -550,6 +565,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
               child: Opacity(
                 opacity: widgetDisabledRouting[listQuestion[i].sId]! ? 0.5 : 1.0,
                 child: TextTypeQuestion(
+                  isPortrait: isPortrait,
                   key: widgetKeys[i],
                   surveyController: surveyController,
                   question: listQuestion[i],
@@ -591,6 +607,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
               child: Opacity(
                 opacity: widgetDisabledRouting[listQuestion[i].sId]! ? 0.5 : 1.0,
                 child: EmployeeTypeQuestion(
+                  isPortrait: isPortrait,
                   key: widgetKeys[i],
                   question: listQuestion[i],
                   index: i,
@@ -647,6 +664,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
               child: Opacity(
                 opacity: widgetDisabledRouting[listQuestion[i].sId]! ? 0.5 : 1.0,
                 child: RadioTypeQuestion(
+                  isPortrait: isPortrait,
                   key: widgetKeys[i],
                   question: listQuestion[i],
                   index: i,
@@ -707,6 +725,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
               child: Opacity(
                 opacity: widgetDisabledRouting[listQuestion[i].sId]! ? 0.5 : 1.0,
                 child: SequenceTypeQuestion(
+                  isPortrait: isPortrait,
                   key: widgetKeys[i],
                   question: listQuestion[i],
                   index: i,
@@ -751,6 +770,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
               child: Opacity(
                 opacity: widgetDisabledRouting[listQuestion[i].sId]! ? 0.5 : 1.0,
                 child: EmojiTypeQuestion(
+                  isPortrait: isPortrait,
                   key: widgetKeys[i],
                   question: listQuestion[i],
                   index: i,
@@ -811,6 +831,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
               child: Opacity(
                 opacity: widgetDisabledRouting[listQuestion[i].sId]! ? 0.5 : 1.0,
                 child: FileTypeQuestion(
+                  isPortrait: isPortrait,
                   key: widgetKeys[i],
                   question: listQuestion[i],
                   index: i,
@@ -831,7 +852,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
   }
 }
 
-void showCustomDialog(BuildContext context) {
+void showCustomDialog(BuildContext context, bool isPortrait) {
   SmartDialog.show(
       clickMaskDismiss: false,
       backDismiss: false,
@@ -841,9 +862,9 @@ void showCustomDialog(BuildContext context) {
       builder: (context) {
         return GetBuilder<SurveyController>(
           builder: (controller) => Container(
-            margin: EdgeInsets.symmetric(horizontal: 30.w),
-            padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 20.w),
-            decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(12.r)), color: Colors.white),
+            margin: EdgeInsets.symmetric(horizontal: isPortrait ? 30.w : 15.w),
+            padding: EdgeInsets.symmetric(horizontal: isPortrait ? 15.w : 7.5.w, vertical: 20.h),
+            decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(isPortrait ? 12.r : 24.r)), color: Colors.white),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
@@ -851,7 +872,8 @@ void showCustomDialog(BuildContext context) {
                 Text(
                     "Save your progress and finish later? Click 'Save & Exit' to continue later, 'Exit Without Saving' to discard progress, or 'Cancel' to resume the survey now.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(height: 1.5, fontWeight: FontWeight.w500, color: AppTheme.lightTextBlackColor, fontSize: 14.sp)),
+                    style: TextStyle(
+                        height: 1.5, fontWeight: FontWeight.w500, color: AppTheme.lightTextBlackColor, fontSize: isPortrait ? 14.sp : 10.sp)),
                 SizedBox(height: 15.h),
                 GestureDetector(
                   onTap: () async {
@@ -863,8 +885,10 @@ void showCustomDialog(BuildContext context) {
                     width: double.infinity,
                     padding: EdgeInsets.symmetric(vertical: 12.h),
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(8.r)), color: AppTheme.lightPrimaryColor),
-                    child: Text("Save & Exit", style: TextStyle(fontWeight: FontWeight.w500, color: AppTheme.lightWhiteTextColor, fontSize: 12.sp)),
+                    decoration:
+                        BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(isPortrait ? 8.r : 16.r)), color: AppTheme.lightPrimaryColor),
+                    child: Text("Save & Exit",
+                        style: TextStyle(fontWeight: FontWeight.w500, color: AppTheme.lightWhiteTextColor, fontSize: isPortrait ? 12.sp : 8.sp)),
                   ),
                 ),
                 SizedBox(height: 10.h),
@@ -877,9 +901,10 @@ void showCustomDialog(BuildContext context) {
                     width: double.infinity,
                     padding: EdgeInsets.symmetric(vertical: 12.h),
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(8.r)), color: AppTheme.lightPrimaryColor),
+                    decoration:
+                        BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(isPortrait ? 8.r : 16.r)), color: AppTheme.lightPrimaryColor),
                     child: Text("Leave Without Saving",
-                        style: TextStyle(fontWeight: FontWeight.w500, color: AppTheme.lightWhiteTextColor, fontSize: 12.sp)),
+                        style: TextStyle(fontWeight: FontWeight.w500, color: AppTheme.lightWhiteTextColor, fontSize: isPortrait ? 12.sp : 8.sp)),
                   ),
                 ),
                 SizedBox(height: 10.h),
@@ -891,8 +916,10 @@ void showCustomDialog(BuildContext context) {
                     width: double.infinity,
                     padding: EdgeInsets.symmetric(vertical: 12.h),
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(8.r)), color: AppTheme.lightPrimaryColor),
-                    child: Text("Cancel", style: TextStyle(fontWeight: FontWeight.w500, color: AppTheme.lightWhiteTextColor, fontSize: 12.sp)),
+                    decoration:
+                        BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(isPortrait ? 8.r : 16.r)), color: AppTheme.lightPrimaryColor),
+                    child: Text("Cancel",
+                        style: TextStyle(fontWeight: FontWeight.w500, color: AppTheme.lightWhiteTextColor, fontSize: isPortrait ? 12.sp : 8.sp)),
                   ),
                 ),
               ],

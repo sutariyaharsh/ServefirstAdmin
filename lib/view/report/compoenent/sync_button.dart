@@ -6,13 +6,12 @@ import 'package:servefirst_admin/theme/app_theme.dart';
 class SyncButton extends StatelessWidget {
   SyncButton({
     super.key,
-    required this.onTap, required this.fontSize, required this.borderRadius, required this.iconSize,
+    required this.onTap,
+    required this.isPortrait,
   });
 
   VoidCallback onTap;
-  final double fontSize;
-  final double borderRadius;
-  final double iconSize;
+  final bool isPortrait;
 
   @override
   Widget build(BuildContext context) {
@@ -22,17 +21,17 @@ class SyncButton extends StatelessWidget {
         backgroundColor: AppTheme.lightPrimaryColor,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(borderRadius),
+          borderRadius: BorderRadius.circular(isPortrait ? 17.r : 34.r),
         ),
       ),
       child: Row(
         children: [
           Text(
             sSync,
-            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w500, color: AppTheme.lightWhiteTextColor),
+            style: TextStyle(fontSize: isPortrait ? 12.sp : 6.5.sp, fontWeight: FontWeight.w500, color: AppTheme.lightWhiteTextColor),
           ),
-          SizedBox(width: 2.w),
-          Icon(Icons.sync, size: iconSize),
+          SizedBox(width: isPortrait ? 2.w : 1.w),
+          Icon(Icons.sync, size: isPortrait ? 18.sp : 8.sp),
         ],
       ),
     );

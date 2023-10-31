@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:servefirst_admin/model/response/location_survey/options.dart';
 
@@ -28,6 +29,10 @@ class Questions {
   @HiveField(10)
   bool? _isNps;
   @HiveField(11)
+  List<String>? _images;
+  @HiveField(12)
+  List<Uint8List>? _qImages;
+  @HiveField(13)
   String? _sId;
 
   Questions(
@@ -42,6 +47,7 @@ class Questions {
       int? maxOptions,
       List<Options>? options,
       bool? isNps,
+      List<String>? images,
       String? sId}) {
     if (text != null) {
       this._text = text;
@@ -75,6 +81,9 @@ class Questions {
     }
     if (isNps != null) {
       this._isNps = isNps;
+    }
+    if (images != null) {
+      this._images = images;
     }
     if (sId != null) {
       this._sId = sId;
@@ -125,6 +134,14 @@ class Questions {
 
   set isNps(bool? isNps) => _isNps = isNps;
 
+  List<String>? get images => _images;
+
+  set images(List<String>? images) => _images = images;
+
+  List<Uint8List>? get qImages => _qImages;
+
+  set qImages(List<Uint8List>? qImages) => _qImages = qImages;
+
   String? get sId => _sId;
 
   set sId(String? sId) => _sId = sId;
@@ -146,6 +163,7 @@ class Questions {
       });
     }
     _isNps = json['is_nps'];
+    _images = json['images'].cast<String>();
     _sId = json['_id'];
   }
 
@@ -164,6 +182,7 @@ class Questions {
       data['options'] = this._options!.map((v) => v.toJson()).toList();
     }
     data['is_nps'] = this._isNps;
+    data['images'] = this._images;
     data['_id'] = this._sId;
     return data;
   }

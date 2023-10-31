@@ -3,20 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:servefirst_admin/theme/app_theme.dart';
 
 class MyButton extends StatelessWidget {
-  MyButton({
-    super.key,
-    required this.onTap,
-    required this.buttonText,
-    this.width,
-    this.height,
-    this.fontSize,
-  });
+  MyButton({super.key, required this.onTap, required this.buttonText, this.width, this.height, this.fontSize, required this.isPortrait});
 
   VoidCallback onTap;
   String buttonText;
   double? width;
   double? height;
   double? fontSize;
+  final bool isPortrait;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +19,7 @@ class MyButton extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         color: AppTheme.lightPrimaryColor,
-        borderRadius: BorderRadius.circular(5.r),
+        borderRadius: BorderRadius.circular(isPortrait ? 5.r : 10.r),
       ),
       child: ElevatedButton(
         onPressed: onTap,
@@ -33,17 +27,18 @@ class MyButton extends StatelessWidget {
           backgroundColor: Colors.transparent,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(17.r),
+            borderRadius: BorderRadius.circular(isPortrait ? 17.r : 34.r),
           ),
         ),
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 15.h),
+          padding: EdgeInsets.symmetric(vertical: isPortrait ? 15.h : 20.h),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 buttonText,
-                style: TextStyle(color: Colors.white, fontSize: fontSize ?? 14.sp, fontFamily: 'Nexa', fontWeight: FontWeight.w700),
+                style: TextStyle(
+                    color: Colors.white, fontSize: fontSize ?? (isPortrait ? 14.sp : 10.sp), fontFamily: 'Nexa', fontWeight: FontWeight.w700),
               ),
             ],
           ),

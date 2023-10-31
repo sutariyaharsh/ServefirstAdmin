@@ -14,180 +14,200 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(ProfileController());
     double statusBarHeight = MediaQuery.of(context).padding.top;
-    return GetBuilder<ProfileController>(
-      builder: (controller) => Scaffold(
-        extendBody: true,
-        body: Stack(
-          children: [
-            Column(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: Container(
-                    color: AppTheme.lightPrimaryColor,
-                  ),
-                ),
-                Expanded(
-                  flex: 7,
-                  child: Container(
-                    color: AppTheme.lightGrayColor,
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 25.w, right: 25.w, top: statusBarHeight + 30.h, bottom: 25.h),
-              child: Stack(
-                alignment: Alignment.topCenter,
+    return LayoutBuilder(builder: (context, constraints) {
+      final isPortrait = constraints.maxWidth < 768;
+      return GetBuilder<ProfileController>(
+        builder: (controller) => Scaffold(
+          extendBody: true,
+          body: Stack(
+            children: [
+              Column(
                 children: [
-                  Container(
-                    width: double.infinity,
-                    margin: EdgeInsets.only(top: 60.h),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12.r)),
-                    child: Column(
-                      children: [
-                        SizedBox(height: 80.h),
-                        Obx(
-                          () => Text(
-                            controller.loginUser.value?.name ?? "",
-                            style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w600, color: Colors.black),
-                          ),
-                        ),
-                        SizedBox(height: 5.h),
-                        Obx(
-                          () => Text(
-                            controller.loginUser.value?.type ?? "",
-                            style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w500, color: Colors.grey),
-                          ),
-                        ),
-                        SizedBox(height: 20.h),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 50.w),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(
-                                Icons.phone,
-                                color: AppTheme.lightGrayTextColor,
-                              ),
-                              SizedBox(width: 10.w),
-                              Obx(
-                                () => Text(
-                                  controller.loginUser.value?.phone ?? "",
-                                  style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400, color: AppTheme.lightBlueTextColor),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 15.h),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 50.w),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(
-                                Icons.alternate_email,
-                                color: AppTheme.lightGrayTextColor,
-                              ),
-                              SizedBox(width: 10.w),
-                              Obx(
-                                () => Text(
-                                  controller.loginUser.value?.email ?? "",
-                                  style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400, color: AppTheme.lightBlueTextColor),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 25.h),
-                        Container(
-                          width: double.infinity,
-                          height: 1.h,
-                          color: AppTheme.lightParticlesColor,
-                        ),
-                        SizedBox(height: 25.h),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 50.w),
-                          child: GestureDetector(
-                            onTap: () {
-                              Get.to(() => const EditProfileScreen());
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.edit,
-                                  color: AppTheme.lightGrayTextColor,
-                                ),
-                                SizedBox(width: 10.w),
-                                Text(
-                                  "Edit Profile",
-                                  style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400, color: AppTheme.lightGrayTextColor),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 15.h),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 50.w),
-                          child: GestureDetector(
-                            onTap: () {
-                              controller.logout();
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.logout,
-                                  color: AppTheme.lightGrayTextColor,
-                                ),
-                                SizedBox(width: 10.w),
-                                Text(
-                                  "Logout",
-                                  style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400, color: AppTheme.lightGrayTextColor),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                  Expanded(
+                    flex: 3,
+                    child: Container(
+                      color: AppTheme.lightPrimaryColor,
                     ),
                   ),
-                  Container(
-                    alignment: Alignment.center,
-                    width: 120.w,
-                    height: 120.h,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppTheme.lightWhite50,
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 1.w,
-                      ),
-                    ),
-                    child: Obx(
-                      () => ClipOval(
-                        child: CachedNetworkImage(
-                          imageUrl: (controller.loginUser.value?.image ?? "").isEmpty
-                              ? "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png"
-                              : controller.loginUser.value?.image ?? "",
-                          placeholder: (context, url) => Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 20),
-                            color: Colors.grey.shade300,
-                          ),
-                          errorWidget: (context, url, error) => Center(child: Image.asset(placeHolderUser)),
-                        ),
-                      ),
+                  Expanded(
+                    flex: 7,
+                    child: Container(
+                      color: AppTheme.lightGrayColor,
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
+              Padding(
+                padding: EdgeInsets.only(
+                    left: isPortrait ? 25.w : 12.5.w,
+                    right: isPortrait ? 25.w : 12.5.w,
+                    top: statusBarHeight + (isPortrait ? 15.h : 30.h),
+                    bottom: isPortrait ? 25.h : 50.h),
+                child: CustomScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  slivers: [
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Stack(
+                        alignment: Alignment.topCenter,
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            margin: EdgeInsets.only(top: isPortrait ? 60.h : 120.h, bottom: isPortrait ? 100.h : 120.h),
+                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(isPortrait ? 12.r : 24.r)),
+                            child: Column(
+                              children: [
+                                SizedBox(height: isPortrait ? 70.h : 120.h),
+                                Obx(
+                                  () => Text(
+                                    controller.loginUser.value?.name ?? "",
+                                    style: TextStyle(fontSize: isPortrait ? 24.sp : 18.sp, fontWeight: FontWeight.w600, color: Colors.black),
+                                  ),
+                                ),
+                                SizedBox(height: isPortrait ? 5.h : 10.h),
+                                Obx(
+                                  () => Text(
+                                    controller.loginUser.value?.type ?? "",
+                                    style: TextStyle(fontSize: isPortrait ? 20.sp : 14.sp, fontWeight: FontWeight.w500, color: Colors.grey),
+                                  ),
+                                ),
+                                SizedBox(height: isPortrait ? 20.h : 40.h),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: isPortrait ? 50.w : 25.w),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.phone,
+                                        color: AppTheme.lightGrayTextColor,
+                                      ),
+                                      SizedBox(width: isPortrait ? 10.w : 5.w),
+                                      Obx(
+                                        () => Text(
+                                          controller.loginUser.value?.phone ?? "",
+                                          style: TextStyle(
+                                              fontSize: isPortrait ? 14.sp : 10.sp, fontWeight: FontWeight.w400, color: AppTheme.lightBlueTextColor),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: isPortrait ? 15.h : 30.h),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: isPortrait ? 50.w : 25.w),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.alternate_email,
+                                        color: AppTheme.lightGrayTextColor,
+                                      ),
+                                      SizedBox(width: isPortrait ? 10.w : 5.w),
+                                      Obx(
+                                        () => Text(
+                                          controller.loginUser.value?.email ?? "",
+                                          style: TextStyle(
+                                              fontSize: isPortrait ? 14.sp : 10.sp, fontWeight: FontWeight.w400, color: AppTheme.lightBlueTextColor),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: isPortrait ? 25.h : 50.h),
+                                Container(
+                                  width: double.infinity,
+                                  height: isPortrait ? 1.h : 2.h,
+                                  color: AppTheme.lightParticlesColor,
+                                ),
+                                SizedBox(height: isPortrait ? 25.h : 50.h),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: isPortrait ? 50.w : 25.w),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Get.to(() => const EditProfileScreen());
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Icon(
+                                          Icons.edit,
+                                          color: AppTheme.lightGrayTextColor,
+                                        ),
+                                        SizedBox(width: isPortrait ? 10.w : 5.w),
+                                        Text(
+                                          "Edit Profile",
+                                          style: TextStyle(
+                                              fontSize: isPortrait ? 14.sp : 10.sp, fontWeight: FontWeight.w400, color: AppTheme.lightGrayTextColor),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: isPortrait ? 15.h : 30.h),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: isPortrait ? 50.w : 25.w),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      controller.logout();
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Icon(
+                                          Icons.logout,
+                                          color: AppTheme.lightGrayTextColor,
+                                        ),
+                                        SizedBox(width: isPortrait ? 10.w : 5.w),
+                                        Text(
+                                          "Logout",
+                                          style: TextStyle(
+                                              fontSize: isPortrait ? 14.sp : 10.sp, fontWeight: FontWeight.w400, color: AppTheme.lightGrayTextColor),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 15.h)
+                              ],
+                            ),
+                          ),
+                          Container(
+                            alignment: Alignment.center,
+                            width: isPortrait ? 120 : 150,
+                            height: isPortrait ? 120 : 150,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppTheme.lightWhite50,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: isPortrait ? 1.w : 0.5.w,
+                              ),
+                            ),
+                            child: Obx(
+                              () => ClipOval(
+                                child: CachedNetworkImage(
+                                  imageUrl: (controller.loginUser.value?.image ?? "").isEmpty
+                                      ? "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png"
+                                      : controller.loginUser.value?.image ?? "",
+                                  placeholder: (context, url) => Container(
+                                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                                    color: Colors.grey.shade300,
+                                  ),
+                                  errorWidget: (context, url, error) => Center(child: Image.asset(placeHolderUser)),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

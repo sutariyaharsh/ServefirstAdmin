@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -21,6 +20,7 @@ class MultiSelectTypeQuestion extends StatefulWidget {
       required this.index,
       required this.surveyType,
       required this.onCommentTextEntered,
+      required this.isPortrait,
       required this.onWriteInTextEntered})
       : super(key: key);
   final Function(List<String>) onMultiSelectItemsSelected;
@@ -29,6 +29,7 @@ class MultiSelectTypeQuestion extends StatefulWidget {
   final Function(String) onCommentTextEntered;
   final Function(String) onWriteInTextEntered;
   final String surveyType;
+  final bool isPortrait;
 
   @override
   State<MultiSelectTypeQuestion> createState() => _MultiSelectTypeQuestionState();
@@ -63,7 +64,7 @@ class _MultiSelectTypeQuestionState extends State<MultiSelectTypeQuestion> {
 
   void _selectItem(int index, SurveyController controller) {
     setState(() {
-      if(controller.surveyJsonDataMap[widget.question.sId!]?.value != null){
+      if (controller.surveyJsonDataMap[widget.question.sId!]?.value != null) {
         var selectedIndices = (controller.surveyJsonDataMap[widget.question.sId!]?.value ?? []) as List<String>;
         if (selectedIndices.contains(widget.question.options![index].sId!)) {
           if (widget.question.minOptions != null) {
@@ -86,7 +87,7 @@ class _MultiSelectTypeQuestionState extends State<MultiSelectTypeQuestion> {
             selectedIndices.add(widget.question.options![index].sId!);
           }
         }
-      }else {
+      } else {
         if (_selectedIndices.contains(widget.question.options![index].sId!)) {
           if (widget.question.minOptions != null) {
             if (_selectedIndices.length > widget.question.minOptions!) {
@@ -117,7 +118,7 @@ class _MultiSelectTypeQuestionState extends State<MultiSelectTypeQuestion> {
   Widget build(BuildContext context) {
     return GetBuilder<SurveyController>(
       builder: (controller) => Padding(
-        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
+        padding: EdgeInsets.symmetric(horizontal: widget.isPortrait ? 15.w : 7.5.w, vertical: widget.isPortrait ? 10.h : 15.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -126,36 +127,55 @@ class _MultiSelectTypeQuestionState extends State<MultiSelectTypeQuestion> {
               children: [
                 Text(
                   "${widget.index + 1}.",
-                  style: TextStyle(fontSize: 16.sp, color: AppTheme.lightPrimaryColor, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: widget.isPortrait ? 16.sp : 10.sp, color: AppTheme.lightPrimaryColor, fontWeight: FontWeight.w600),
                 ),
-                SizedBox(width: 5.h),
+                SizedBox(width: widget.isPortrait ? 5.w : 2.5.w),
                 Expanded(
                   child: Text(
                     "${widget.question.text}",
-                    style: TextStyle(height: 1.3, fontSize: 14.sp, color: AppTheme.lightPrimaryColor, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                        height: 1.3, fontSize: widget.isPortrait ? 14.sp : 9.sp, color: AppTheme.lightPrimaryColor, fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 5.h),
+            if ((widget.question.qImages ?? []).isNotEmpty)
+              Wrap(
+                spacing: widget.isPortrait ? 10.w : 5.w,
+                runSpacing: widget.isPortrait ? 12.h : 14.h,
+                children: List.generate(
+                  widget.question.qImages!.length,
+                  (index) => Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(image: MemoryImage(widget.question.qImages![index]), fit: BoxFit.fill),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(widget.isPortrait ? 5.r : 10.r),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            SizedBox(height: widget.isPortrait ? 5.h : 10.h),
             if (widget.question.required ?? false)
               Obx(
                 () => controller.surveyJsonDataMap[widget.question.sId!]?.value == null
                     ? Text("* Please select any option",
                         style: TextStyle(
-                          fontSize: 10.sp,
+                          fontSize: widget.isPortrait ? 10.sp : 6.sp,
                           color: AppTheme.lightRed,
                           fontWeight: FontWeight.w600,
                         ))
                     : Container(),
               ),
-            SizedBox(height: 10.h),
+            SizedBox(height: widget.isPortrait ? 10.h : 20.h),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.w),
+              padding: EdgeInsets.symmetric(horizontal: widget.isPortrait ? 10.w : 5.w),
               child: Obx(
                 () => Wrap(
-                  spacing: 12.w,
-                  runSpacing: 12.h,
+                  spacing: widget.isPortrait ? 12.w : 6.w,
+                  runSpacing: widget.isPortrait ? 12.h : 14.h,
                   children: List.generate(
                     widget.question.options!.length,
                     (index) => GestureDetector(
@@ -166,51 +186,65 @@ class _MultiSelectTypeQuestionState extends State<MultiSelectTypeQuestion> {
                             : widget.onMultiSelectItemsSelected(_selectedIndices);
                       },
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
+                        padding: EdgeInsets.symmetric(horizontal: widget.isPortrait ? 15.w : 7.5.w, vertical: widget.isPortrait ? 10.h : 15.h),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(
-                              Radius.circular(5.r),
+                              Radius.circular(widget.isPortrait ? 5.r : 10.r),
                             ),
                             color: controller.surveyJsonDataMap[widget.question.sId!]?.value != null
                                 ? findIndicesByIds(controller.surveyJsonDataMap[widget.question.sId!]?.value as List<String>).contains(index)
                                     ? AppTheme.lightPrimaryColor
                                     : Colors.transparent
                                 : Colors.transparent,
-                            border: Border.all(width: 1.w, color: AppTheme.lightPrimaryColor)),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                            border: Border.all(width: widget.isPortrait ? 1.w : 0.5.w, color: AppTheme.lightPrimaryColor)),
+                        child: Column(
                           children: [
-                            SvgIcon(
-                              assetImage: controller.surveyJsonDataMap[widget.question.sId!]?.value != null
-                                  ? findIndicesByIds((controller.surveyJsonDataMap[widget.question.sId!]?.value ?? [-1]) as List<String>)
-                                          .contains(index)
-                                      ? icCheckboxChecked
-                                      : icCheckboxUnChecked
-                                  : icCheckboxUnChecked,
-                              width: 20.w,
-                              height: 20.h,
-                              color: controller.surveyJsonDataMap[widget.question.sId!]?.value != null
-                                  ? findIndicesByIds((controller.surveyJsonDataMap[widget.question.sId!]?.value ?? [-1]) as List<String>)
-                                          .contains(index)
-                                      ? Colors.white
-                                      : Colors.black
-                                  : Colors.black,
-                            ),
-                            SizedBox(width: 4.w),
-                            Flexible(
-                              child: Text(
-                                '${widget.question.options![index].text}',
-                                style: TextStyle(
-                                    color: controller.surveyJsonDataMap[widget.question.sId!]?.value != null
-                                        ? findIndicesByIds((controller.surveyJsonDataMap[widget.question.sId!]?.value ?? [-1]) as List<String>)
-                                                .contains(index)
-                                            ? Colors.white
-                                            : Colors.black
-                                        : Colors.black,
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w500),
+                            if ((widget.question.options![index].aImageUrl ?? "") != "")
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(20.0), // Adjust the radius to control the curve
+                                child: Image.memory(
+                                  widget.question.options![index].aImageUrl!, // Replace with your image path
+                                  width: 80, // Adjust the width and height as needed
+                                  height: 80,
+                                  fit: BoxFit.fill, // You can change this to BoxFit.contain or other values
+                                ),
                               ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SvgIcon(
+                                  assetImage: controller.surveyJsonDataMap[widget.question.sId!]?.value != null
+                                      ? findIndicesByIds((controller.surveyJsonDataMap[widget.question.sId!]?.value ?? [-1]) as List<String>)
+                                              .contains(index)
+                                          ? icCheckboxChecked
+                                          : icCheckboxUnChecked
+                                      : icCheckboxUnChecked,
+                                  width: widget.isPortrait ? 20 : 30,
+                                  height: widget.isPortrait ? 20 : 30,
+                                  color: controller.surveyJsonDataMap[widget.question.sId!]?.value != null
+                                      ? findIndicesByIds((controller.surveyJsonDataMap[widget.question.sId!]?.value ?? [-1]) as List<String>)
+                                              .contains(index)
+                                          ? Colors.white
+                                          : Colors.black
+                                      : Colors.black,
+                                ),
+                                SizedBox(width: widget.isPortrait ? 4.w : 2.w),
+                                Flexible(
+                                  child: Text(
+                                    '${widget.question.options![index].text}',
+                                    style: TextStyle(
+                                        color: controller.surveyJsonDataMap[widget.question.sId!]?.value != null
+                                            ? findIndicesByIds((controller.surveyJsonDataMap[widget.question.sId!]?.value ?? [-1]) as List<String>)
+                                                    .contains(index)
+                                                ? Colors.white
+                                                : Colors.black
+                                            : Colors.black,
+                                        fontSize: widget.isPortrait ? 12.sp : 8.sp,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -220,9 +254,10 @@ class _MultiSelectTypeQuestionState extends State<MultiSelectTypeQuestion> {
                 ),
               ),
             ),
-            SizedBox(height: 15.h),
+            SizedBox(height: widget.isPortrait ? 15.h : 20.h),
             if (_isShowWriteIn)
               MyTextField(
+                isPortrait: widget.isPortrait,
                 hint: "Add Comments",
                 onChange: (val) {
                   widget.onWriteInTextEntered(val);
@@ -237,7 +272,7 @@ class _MultiSelectTypeQuestionState extends State<MultiSelectTypeQuestion> {
             if (widget.surveyType == "audition")
               Column(
                 children: [
-                  SizedBox(height: 15.h),
+                  SizedBox(height: widget.isPortrait ? 15.h : 20.h),
                   if (!_isShowCommentText && !_isShowCommentInput)
                     GestureDetector(
                       onTap: () {
@@ -248,43 +283,45 @@ class _MultiSelectTypeQuestionState extends State<MultiSelectTypeQuestion> {
                         children: [
                           Text(
                             "Add Comments",
-                            style: TextStyle(color: AppTheme.lightPrimaryColor, fontSize: 14.sp, fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                                color: AppTheme.lightPrimaryColor, fontSize: widget.isPortrait ? 14.sp : 10.sp, fontWeight: FontWeight.w600),
                           ),
                           Icon(
                             Icons.add,
-                            size: 20.sp,
+                            size: widget.isPortrait ? 20.sp : 15.sp,
                             color: AppTheme.lightPrimaryColor,
                           ),
                         ],
                       ),
                     ),
-                  SizedBox(height: 10.h),
+                  SizedBox(height: widget.isPortrait ? 10.h : 15.h),
                   if (_isShowCommentInput)
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w),
+                      padding: EdgeInsets.symmetric(horizontal: widget.isPortrait ? 10.w : 5.w),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(
-                            Radius.circular(6.r),
+                            Radius.circular(widget.isPortrait ? 6.r : 12.r),
                           ),
-                          border: Border.all(width: 1.w, color: AppTheme.lightGray)),
+                          border: Border.all(width: widget.isPortrait ? 1.w : 0.5.w, color: AppTheme.lightGray)),
                       child: Column(
                         children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               SizedBox(
-                                height: 80.h,
+                                height: widget.isPortrait ? 80.h : 100.h,
                                 child: TextFormField(
                                   controller: _commentController,
                                   textDirection: TextDirection.ltr,
                                   cursorColor: AppTheme.lightPrimaryColor,
-                                  style: TextStyle(color: Colors.black, fontSize: 13.sp, fontWeight: FontWeight.w500),
+                                  style: TextStyle(color: Colors.black, fontSize: widget.isPortrait ? 13.sp : 10.sp, fontWeight: FontWeight.w500),
                                   minLines: 1,
                                   // Set this to control the minimum number of lines to display
                                   maxLines: null,
                                   decoration: InputDecoration(
                                       hintText: "Enter Comment",
-                                      hintStyle: TextStyle(color: AppTheme.lightDarkGray, fontSize: 13.sp, fontWeight: FontWeight.w500),
+                                      hintStyle: TextStyle(
+                                          color: AppTheme.lightDarkGray, fontSize: widget.isPortrait ? 13.sp : 10.sp, fontWeight: FontWeight.w500),
                                       border: InputBorder.none),
                                 ),
                               ),
@@ -298,7 +335,7 @@ class _MultiSelectTypeQuestionState extends State<MultiSelectTypeQuestion> {
                                     _showCommentText();
                                   }
                                 },
-                                icon: Icon(Icons.send),
+                                icon: const Icon(Icons.send),
                               ),
                             ],
                           )
@@ -307,21 +344,21 @@ class _MultiSelectTypeQuestionState extends State<MultiSelectTypeQuestion> {
                     ),
                   if (_isShowCommentText)
                     Container(
-                      margin: EdgeInsets.only(top: 10.h),
+                      margin: EdgeInsets.only(top: widget.isPortrait ? 10.h : 15.h),
                       width: double.infinity,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(
-                            Radius.circular(6.r),
+                            Radius.circular(widget.isPortrait ? 6.r : 12.r),
                           ),
-                          border: Border.all(width: 1.w, color: AppTheme.lightGray)),
+                          border: Border.all(width: widget.isPortrait ? 1.w : 0.5.w, color: AppTheme.lightGray)),
                       child: Row(
                         children: [
                           Expanded(
                             child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 10.w),
+                              padding: EdgeInsets.symmetric(horizontal: widget.isPortrait ? 10.w : 5.w),
                               child: Text(
                                 _commentController.text,
-                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12.sp, color: Colors.black),
+                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: widget.isPortrait ? 12.sp : 8.sp, color: Colors.black),
                               ),
                             ),
                           ),
@@ -340,7 +377,7 @@ class _MultiSelectTypeQuestionState extends State<MultiSelectTypeQuestion> {
                         ],
                       ),
                     ),
-                  SizedBox(height: 10.h),
+                  SizedBox(height: widget.isPortrait ? 10.h : 15.h),
                   GestureDetector(
                     onTap: () {
                       _showOptionsDialog(context, controller);
@@ -350,20 +387,21 @@ class _MultiSelectTypeQuestionState extends State<MultiSelectTypeQuestion> {
                       children: [
                         Text(
                           "Upload Image",
-                          style: TextStyle(color: AppTheme.lightPrimaryColor, fontSize: 14.sp, fontWeight: FontWeight.w600),
+                          style:
+                              TextStyle(color: AppTheme.lightPrimaryColor, fontSize: widget.isPortrait ? 14.sp : 10.sp, fontWeight: FontWeight.w600),
                         ),
                         Icon(
                           Icons.add,
-                          size: 20.sp,
+                          size: widget.isPortrait ? 20.sp : 15.sp,
                           color: AppTheme.lightPrimaryColor,
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 10.h),
+                  SizedBox(height: widget.isPortrait ? 10.h : 15.h),
                   Obx(
                     () => ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: controller.imageFileAuditionListMap[widget.question.sId]?.length ?? 0,
                       itemBuilder: (context, index) {
@@ -374,16 +412,16 @@ class _MultiSelectTypeQuestionState extends State<MultiSelectTypeQuestion> {
                           padding: EdgeInsets.symmetric(vertical: 10.h),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.all(
-                                Radius.circular(5.r),
+                                Radius.circular(widget.isPortrait ? 5.r : 10.r),
                               ),
                               border: Border.all(width: 1.w, color: AppTheme.lightGray)),
                           child: ListTile(
                             leading: Container(
-                              width: 55.w,
-                              height: 55.h,
+                              width: widget.isPortrait ? 55 : 85,
+                              height: widget.isPortrait ? 55 : 85,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.all(
-                                  Radius.circular(5.r),
+                                  Radius.circular(widget.isPortrait ? 5.r : 10.r),
                                 ),
                                 image: DecorationImage(
                                   image: MemoryImage(pickedImage),
@@ -397,7 +435,8 @@ class _MultiSelectTypeQuestionState extends State<MultiSelectTypeQuestion> {
                                   .last*/
                               "Image Name",
                               maxLines: 1,
-                              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12.sp, color: AppTheme.lightGrayTextColor),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500, fontSize: widget.isPortrait ? 12.sp : 8.sp, color: AppTheme.lightGrayTextColor),
                             ),
                             // Replace with the actual image name
                             trailing: GestureDetector(
@@ -425,7 +464,7 @@ class _MultiSelectTypeQuestionState extends State<MultiSelectTypeQuestion> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Select an option'),
+          title: const Text('Select an option'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[

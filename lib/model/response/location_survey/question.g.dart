@@ -28,13 +28,15 @@ class QuestionsAdapter extends TypeAdapter<Questions> {
       .._maxOptions = fields[8] as int?
       .._options = (fields[9] as List?)?.cast<Options>()
       .._isNps = fields[10] as bool?
-      .._sId = fields[11] as String?;
+      .._images = (fields[11] as List?)?.cast<String>()
+      .._qImages = (fields[12] as List?)?.cast<Uint8List>()
+      .._sId = fields[13] as String?;
   }
 
   @override
   void write(BinaryWriter writer, Questions obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj._text)
       ..writeByte(1)
@@ -58,6 +60,10 @@ class QuestionsAdapter extends TypeAdapter<Questions> {
       ..writeByte(10)
       ..write(obj._isNps)
       ..writeByte(11)
+      ..write(obj._images)
+      ..writeByte(12)
+      ..write(obj._qImages)
+      ..writeByte(13)
       ..write(obj._sId);
   }
 

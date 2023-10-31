@@ -16,16 +16,16 @@ class ResponseDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     double statusBarHeight = MediaQuery.of(context).padding.top;
     final controller = Get.put(ResponseDetailsController(index));
-    return GetBuilder<ResponseDetailsController>(
-      builder: (controller) => Scaffold(
-        extendBody: true,
-        body: SafeArea(
-          top: false,
-          child: Column(
+    return LayoutBuilder(builder: (context, constraints) {
+      final isPortrait = constraints.maxWidth < 768;
+      return GetBuilder<ResponseDetailsController>(
+        builder: (controller) => Scaffold(
+          extendBody: true,
+          body: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: EdgeInsets.only(top: statusBarHeight, left: 20.w, right: 20.w, bottom: 20.h),
+                padding: EdgeInsets.only(top: isPortrait ? statusBarHeight : 30.h, left: 20.w, right: 20.w, bottom: isPortrait ? 20.h : 20.h),
                 color: AppTheme.lightPrimaryColor,
                 child: GestureDetector(
                   onTap: () {
@@ -37,11 +37,11 @@ class ResponseDetailsScreen extends StatelessWidget {
                         Icons.arrow_back_ios,
                         color: AppTheme.lightWhiteTextColor,
                       ),
-                      SizedBox(width: 10.w),
+                      SizedBox(width: isPortrait ? 10.w : 5.w),
                       Obx(
                         () => Text(
                           controller.responseData.value!.survey!,
-                          style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, color: AppTheme.lightWhiteTextColor),
+                          style: TextStyle(fontSize: isPortrait ? 14.sp : 10.sp, fontWeight: FontWeight.w500, color: AppTheme.lightWhiteTextColor),
                         ),
                       )
                     ],
@@ -50,13 +50,17 @@ class ResponseDetailsScreen extends StatelessWidget {
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  physics: ClampingScrollPhysics(),
+                  physics: const ClampingScrollPhysics(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
                         width: double.infinity,
-                        padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 20.h, top: 5.h),
+                        padding: EdgeInsets.only(
+                            left: isPortrait ? 20.w : 10.w,
+                            right: isPortrait ? 20.w : 10.w,
+                            bottom: isPortrait ? 20.h : 20.h,
+                            top: isPortrait ? 5.h : 10.h),
                         decoration: BoxDecoration(
                             color: AppTheme.lightPrimaryColor,
                             borderRadius: BorderRadius.only(bottomRight: Radius.circular(25.r), bottomLeft: Radius.circular(25.r))),
@@ -65,28 +69,33 @@ class ResponseDetailsScreen extends StatelessWidget {
                           children: [
                             Text(
                               "Survey type",
-                              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13.sp, color: AppTheme.lightGrayColor),
+                              style: TextStyle(fontWeight: FontWeight.w600, fontSize: isPortrait ? 13.sp : 9.sp, color: AppTheme.lightGrayColor),
                             ),
-                            SizedBox(height: 10.h),
+                            SizedBox(height: isPortrait ? 10.h : 20.h),
                             Obx(
                               () => Text(
                                 controller.responseData.value!.surveyType!,
-                                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20.sp, color: AppTheme.lightWhiteTextColor),
+                                style:
+                                    TextStyle(fontWeight: FontWeight.w600, fontSize: isPortrait ? 20.sp : 15.sp, color: AppTheme.lightWhiteTextColor),
                               ),
                             ),
-                            SizedBox(height: 5.h),
+                            SizedBox(height: isPortrait ? 5.h : 10.h),
                             Obx(
                               () => Text(
                                 controller.responseData.value!.surveyDescription!,
-                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12.sp, height: 1.4, color: AppTheme.lightWhiteTextColor),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: isPortrait ? 12.sp : 8.sp,
+                                    height: 1.4,
+                                    color: AppTheme.lightWhiteTextColor),
                               ),
                             ),
-                            SizedBox(height: 15.h),
+                            SizedBox(height: isPortrait ? 15.h : 30.h),
                             Text(
                               "Categories",
-                              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13.sp, color: AppTheme.lightGrayColor),
+                              style: TextStyle(fontWeight: FontWeight.w600, fontSize: isPortrait ? 13.sp : 9.sp, color: AppTheme.lightGrayColor),
                             ),
-                            SizedBox(height: 5.h),
+                            SizedBox(height: isPortrait ? 5.h : 10.h),
                             Row(
                               children: [
                                 Expanded(
@@ -94,13 +103,14 @@ class ResponseDetailsScreen extends StatelessWidget {
                                     () => Wrap(
                                       children: controller.categoriesList.map((item) {
                                         return Container(
-                                          margin: EdgeInsets.symmetric(horizontal: 5.w, vertical: 5.h),
-                                          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 3.h),
+                                          margin: EdgeInsets.symmetric(horizontal: isPortrait ? 5.w : 2.w, vertical: isPortrait ? 5.h : 10.h),
+                                          padding: EdgeInsets.symmetric(horizontal: isPortrait ? 10.w : 5.w, vertical: isPortrait ? 3.h : 6.h),
                                           decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(15.r), border: Border.all(width: 1.w, color: Colors.white)),
+                                              borderRadius: BorderRadius.circular(isPortrait ? 15.r : 30.r),
+                                              border: Border.all(width: 1.w, color: Colors.white)),
                                           child: Text(
                                             item.name!,
-                                            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12.sp, color: Colors.white),
+                                            style: TextStyle(fontWeight: FontWeight.w500, fontSize: isPortrait ? 12.sp : 8.sp, color: Colors.white),
                                           ),
                                         );
                                       }).toList(),
@@ -112,12 +122,14 @@ class ResponseDetailsScreen extends StatelessWidget {
                                   children: [
                                     Text(
                                       "Created at",
-                                      style: TextStyle(color: AppTheme.lightGrayColor, fontSize: 12.sp, fontWeight: FontWeight.w500),
+                                      style:
+                                          TextStyle(color: AppTheme.lightGrayColor, fontSize: isPortrait ? 12.sp : 8.sp, fontWeight: FontWeight.w500),
                                     ),
                                     Obx(
                                       () => Text(
                                         formatDateString(controller.responseData.value!.createdAt!),
-                                        style: TextStyle(color: AppTheme.lightWhiteTextColor, fontSize: 12.sp, fontWeight: FontWeight.w600),
+                                        style: TextStyle(
+                                            color: AppTheme.lightWhiteTextColor, fontSize: isPortrait ? 12.sp : 8.sp, fontWeight: FontWeight.w600),
                                       ),
                                     ),
                                   ],
@@ -127,15 +139,15 @@ class ResponseDetailsScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                      SizedBox(height: 10.h),
+                      SizedBox(height: isPortrait ? 10.h : 20.h),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        padding: EdgeInsets.symmetric(horizontal: isPortrait ? 20.w : 10.w),
                         child: Text(
                           "Summary",
-                          style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.lightGrayTextColor, fontSize: 14.sp),
+                          style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.lightGrayTextColor, fontSize: isPortrait ? 14.sp : 10.sp),
                         ),
                       ),
-                      SizedBox(height: 15.h),
+                      SizedBox(height: isPortrait ? 15.h : 30.h),
                       Obx(
                         () => Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -145,23 +157,26 @@ class ResponseDetailsScreen extends StatelessWidget {
                                 value: (controller.responseData.value!.npsScore ?? 0) / 100,
                                 subtitle: "Promotor",
                                 trackColor: AppTheme.lightGreen,
-                                title: "NPS"),
+                                title: "NPS",
+                                isPortrait: isPortrait),
                             CircularProgressResponse(
                                 valueText: "${controller.responseData.value!.answerScore!}/${controller.responseData.value!.questionScore!}",
                                 value: controller.responseData.value!.answerScore! / controller.responseData.value!.questionScore!,
                                 subtitle: "Score",
                                 trackColor: AppTheme.lightRed,
-                                title: "Total Score"),
+                                title: "Total Score",
+                                isPortrait: isPortrait),
                             CircularProgressResponse(
                                 valueText: '${controller.responseData.value!.resultPercent!}',
                                 value: controller.responseData.value!.resultPercent! / 100,
                                 subtitle: "Promotor",
                                 trackColor: AppTheme.lightRed,
-                                title: "Result"),
+                                title: "Result",
+                                isPortrait: isPortrait),
                           ],
                         ),
                       ),
-                      SizedBox(height: 10.h),
+                      SizedBox(height: isPortrait ? 10.h : 20.h),
                       Obx(
                         () => ListView.builder(
                           physics: const NeverScrollableScrollPhysics(),
@@ -170,7 +185,7 @@ class ResponseDetailsScreen extends StatelessWidget {
                           scrollDirection: Axis.vertical,
                           itemCount: controller.answersList.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return ResponseDetailsListViewItem(answers: controller.answersList[index], index: index);
+                            return ResponseDetailsListViewItem(answers: controller.answersList[index], index: index, isPortrait: isPortrait);
                           },
                         ),
                       ),
@@ -181,7 +196,7 @@ class ResponseDetailsScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

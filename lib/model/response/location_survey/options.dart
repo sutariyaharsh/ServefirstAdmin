@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 
 part 'options.g.dart';
@@ -11,15 +12,19 @@ class Options {
   @HiveField(2)
   String? _iconClass;
   @HiveField(3)
-  bool? _writeIn;
+  String? _imageUrl;
   @HiveField(4)
-  bool? _finishSurvey;
+  Uint8List? _aImageUrl;
   @HiveField(5)
-  int? _routeToIndex;
+  bool? _writeIn;
   @HiveField(6)
+  bool? _finishSurvey;
+  @HiveField(7)
+  int? _routeToIndex;
+  @HiveField(8)
   String? _sId;
 
-  Options({String? text, int? value, String? iconClass, bool? writeIn, bool? finishSurvey, int? routeToIndex, String? sId}) {
+  Options({String? text, int? value, String? iconClass, String? imageUrl, bool? writeIn, bool? finishSurvey, int? routeToIndex, String? sId}) {
     if (text != null) {
       this._text = text;
     }
@@ -28,6 +33,9 @@ class Options {
     }
     if (iconClass != null) {
       this._iconClass = iconClass;
+    }
+    if (imageUrl != null) {
+      this._imageUrl = imageUrl;
     }
     if (writeIn != null) {
       this._writeIn = writeIn;
@@ -55,6 +63,14 @@ class Options {
 
   set iconClass(String? iconClass) => _iconClass = iconClass;
 
+  String? get imageUrl => _imageUrl;
+
+  set imageUrl(String? imageUrl) => _imageUrl = imageUrl;
+
+  Uint8List? get aImageUrl => _aImageUrl;
+
+  set aImageUrl(Uint8List? aImageUrl) => _aImageUrl = aImageUrl;
+
   bool? get writeIn => _writeIn;
 
   set writeIn(bool? writeIn) => _writeIn = writeIn;
@@ -75,6 +91,7 @@ class Options {
     _text = json['text'];
     _value = json['value'];
     _iconClass = json['iconClass'];
+    _imageUrl = json['imageUrl'];
     _writeIn = json['write_in'];
     _finishSurvey = json['finish_survey'];
     _routeToIndex = json['route_to_index'];
@@ -86,6 +103,7 @@ class Options {
     data['text'] = this._text;
     data['value'] = this._value;
     data['iconClass'] = this._iconClass;
+    data['imageUrl'] = this._imageUrl;
     data['write_in'] = this._writeIn;
     data['finish_survey'] = this._finishSurvey;
     data['route_to_index'] = this._routeToIndex;

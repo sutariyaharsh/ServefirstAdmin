@@ -11,6 +11,7 @@ class MyTextField extends StatefulWidget {
   final TextInputType? textInputType;
   final List<TextInputFormatter>? inputFormatters;
   final bool enable;
+  final bool isPortrait;
   final String? initialValue;
   final bool obsecureText;
   final IconData? prefixIcon;
@@ -20,7 +21,7 @@ class MyTextField extends StatefulWidget {
   final double? width;
   final double? height;
 
-  MyTextField(
+  const MyTextField(
       {Key? key,
       this.width,
       this.height,
@@ -31,6 +32,7 @@ class MyTextField extends StatefulWidget {
       this.textInputType,
       this.inputFormatters,
       this.enable = true,
+      this.isPortrait = true,
       this.initialValue,
       this.obsecureText = false,
       this.prefixIcon,
@@ -77,39 +79,43 @@ class _MyTextFieldState extends State<MyTextField> {
         },
         onEditingComplete: widget.onEditComplete,
         obscureText: _isVisible,
-        style: TextStyle(color: Colors.black, fontSize: 13.sp, fontWeight: FontWeight.w500),
+        style: TextStyle(color: Colors.black, fontSize: widget.isPortrait ? 13.sp : 7.sp, fontWeight: FontWeight.w500),
         textAlign: widget.textAlign,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         decoration: InputDecoration(
-          errorStyle: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w500),
+          errorStyle: TextStyle(fontSize: widget.isPortrait ? 10.sp : 5.sp, fontWeight: FontWeight.w500),
           hintText: widget.hint,
-          hintStyle: TextStyle(color: Colors.black, fontSize: 13.sp, fontWeight: FontWeight.w500),
+          hintStyle: TextStyle(color: Colors.black, fontSize: widget.isPortrait ? 13.sp : 7.sp, fontWeight: FontWeight.w500),
           suffixIcon: widget.obsecureText
               ? GestureDetector(
                   child: _isVisible
-                      ? Icon(
-                          Icons.visibility_off,
-                          size: 18.sp,
-                          color: Colors.grey,
-                        )
-                      : Icon(
-                          Icons.visibility,
-                          size: 18.sp,
-                          color: Colors.grey,
-                        ),
+                      ? Icon(Icons.visibility_off, size: widget.isPortrait ? 18.sp : 8.sp, color: Colors.grey)
+                      : Icon(Icons.visibility, size: widget.isPortrait ? 18.sp : 8.sp, color: Colors.grey),
                   onTap: () => setState(() {
                     _isVisible = !_isVisible;
                   }),
                 )
               : null,
-          contentPadding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+          contentPadding: EdgeInsets.symmetric(horizontal: widget.isPortrait ? 10.w : 5.w, vertical: widget.isPortrait ? 5.h : 10.h),
           prefixIcon: widget.prefixIcon != null ? Icon(widget.prefixIcon, color: Colors.black) : null,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.r), borderSide: BorderSide(color: Colors.grey, width: 1)),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(5.r), borderSide: BorderSide(color: Colors.grey, width: 1)),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(5.r), borderSide: BorderSide(color: Colors.grey, width: 1)),
-          disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(5.r), borderSide: BorderSide(color: Colors.grey, width: 1)),
-          errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(5.r), borderSide: BorderSide(color: Colors.grey, width: 1)),
-          focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(5.r), borderSide: BorderSide(color: Colors.grey, width: 1)),
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(widget.isPortrait ? 5.r : 10.r),
+              borderSide: BorderSide(color: Colors.grey, width: widget.isPortrait ? 1.w : 0.5.w)),
+          enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(widget.isPortrait ? 5.r : 10.r),
+              borderSide: BorderSide(color: Colors.grey, width: widget.isPortrait ? 1.w : 0.5.w)),
+          focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(widget.isPortrait ? 5.r : 10.r),
+              borderSide: BorderSide(color: Colors.grey, width: widget.isPortrait ? 1.w : 0.5.w)),
+          disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(widget.isPortrait ? 5.r : 10.r),
+              borderSide: BorderSide(color: Colors.grey, width: widget.isPortrait ? 1.w : 0.5.w)),
+          errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(widget.isPortrait ? 5.r : 10.r),
+              borderSide: BorderSide(color: Colors.grey, width: widget.isPortrait ? 1.w : 0.5.w)),
+          focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(widget.isPortrait ? 5.r : 10.r),
+              borderSide: BorderSide(color: Colors.grey, width: widget.isPortrait ? 1.w : 0.5.w)),
         ),
       ),
     );
